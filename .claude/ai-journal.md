@@ -295,3 +295,27 @@ micro-frontend load needs a full page reload to retry.
 **Candidate review:**
 
 ---
+
+---
+
+## Entry 10 — 2026-11-15 19:12 IST — Publish to GitHub
+
+**Instruction:** After testing the full workflow and seeing every suite pass, publish the repository to GitHub as a
+public repository.
+
+**Produced:** `prompts/02-publish-to-github.md`, this entry, and a public repository at
+https://github.com/supratik01/chubb-claims-platform with the full commit history on `main`.
+
+**Checks before publishing:** the working tree was clean and had no remote; the assessment inputs (the brief, the
+structure file and the slides) sit outside the repository folder and are not tracked; no environment files, build
+output or dependencies are tracked; the only credentials in the repository are the documented local defaults.
+
+**Alternatives considered:**
+- *Squash the history into one commit before publishing.* Rejected: the small, intent-describing commits are part of
+  what the assessment reviews.
+- *Publish as private and share access with the reviewers.* Not chosen, because the instruction was a public
+  repository.
+
+**Corrections to my own output:** none.
+
+**Candidate review:**
