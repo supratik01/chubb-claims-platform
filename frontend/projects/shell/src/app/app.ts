@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ROLE_LABELS, SessionStore } from '@claims/shared';
-import { filter, skip } from 'rxjs';
+import { distinctUntilChanged, filter, map, skip } from 'rxjs';
 import { navigationFor } from './navigation';
 
 @Component({
@@ -35,11 +35,14 @@ export class App {
   });
 
   constructor() {
-    // After each in-app navigation, move focus to the main region so keyboard and screen-reader users start at
-    // the new content rather than at the link they used. The first load is left alone.
+    // When the page changes, move focus to the main region so keyboard and screen-reader users start at the new
+    // content rather than at the link they used. The first load is left alone, and so are changes to the query
+    // string only (such as switching work-queue tabs), where focus must stay on the control the user is using.
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
+        map((event) => pathOf(event.urlAfterRedirects)),
+        distinctUntilChanged(),
         skip(1),
         takeUntilDestroyed(),
       )
@@ -55,4 +58,9 @@ export class App {
     this.session.signOut();
     void this.router.navigate(['/login']);
   }
+}
+
+/** The path of a router URL without its query string or fragment. */
+export function pathOf(url: string): string {
+  return url.split(/[?#]/, 1)[0];
 }
