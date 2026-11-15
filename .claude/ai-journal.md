@@ -181,3 +181,26 @@ reviewed only. Listed under next steps.
 **Candidate review:**
 
 ---
+
+## Entry 07 — 2026-11-15 14:41 IST — Resumed session: take stock before building
+
+**Instruction:** `prompts/01-resume-session.md`: the master prompt, sent again.
+
+**Produced:** No code. Read the journal, `NOTES.md`, the requirements, the architecture document and the contract
+again, and re-ran `mvn test`: 78 tests, 0 failures, 0 errors.
+
+**Alternatives considered:**
+- *Start the repository again from Step 1*, as a literal reading of the prompt would suggest. Rejected: the existing
+  history already satisfies Steps 1 and 2 and the backend part of Step 3, and rewriting it would destroy the honest
+  record of how it was built.
+- *Trust the journal's test count.* My first quick count of the surefire reports said 57, not 78. Checked before
+  writing anything down: the claim test class reports its nested classes separately, so the summary lines undercount.
+  The per-file XML reports add up to 78, which matches entry 06.
+
+**Remaining scope at this point:** the Angular shell, both micro-frontends and the shared library; frontend tests;
+Dockerfiles and `docker-compose.yml`; the Postman collection; `README.md` and `docs/walkthrough.md`; verification from
+a fresh clone.
+
+**Candidate review:**
+
+---
