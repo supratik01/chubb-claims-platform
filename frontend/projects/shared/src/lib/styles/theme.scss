@@ -304,6 +304,13 @@ a {
   .cc-numeric {
     text-align: right;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  // Identifiers and buttons stay on one line; the wrapper scrolls sideways on narrow screens instead.
+  th[scope='row'],
+  .cc-button {
+    white-space: nowrap;
   }
 }
 
