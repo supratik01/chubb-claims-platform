@@ -1,0 +1,5 @@
+# Demo profile: seeds users, policies and claims into an empty database (see DemoDataSeeder).
+# The password below is for throwaway demo users only and is documented in the README.
+claims:
+  demo:
+    user-password: ${DEMO_USER_PASSWORD:Demo-Passw0rd!}
