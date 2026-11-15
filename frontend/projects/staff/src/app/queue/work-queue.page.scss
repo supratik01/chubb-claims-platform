@@ -1,0 +1,24 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cc-space-1);
+  border-bottom: 1px solid var(--cc-color-border);
+  margin-bottom: var(--cc-space-4);
+}
+
+.tabs__tab {
+  font: inherit;
+  font-weight: 600;
+  padding: var(--cc-space-2) var(--cc-space-4);
+  min-height: 2.5rem;
+  border: none;
+  background: transparent;
+  color: var(--cc-color-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+
+  &[aria-selected='true'] {
+    color: var(--cc-color-primary);
+    border-bottom-color: var(--cc-color-primary);
+  }
+}

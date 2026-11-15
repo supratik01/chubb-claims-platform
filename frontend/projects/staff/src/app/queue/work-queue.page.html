@@ -1,0 +1,81 @@
+<section class="cc-page">
+  <header class="cc-page-header">
+    <h1>Work queue</h1>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Claim lists">
+    @for (option of views; track option.view; let i = $index) {
+      <button
+        type="button"
+        role="tab"
+        class="tabs__tab"
+        [id]="'tab-' + option.view"
+        [attr.aria-selected]="store.view().view === option.view"
+        [attr.aria-controls]="'panel-' + option.view"
+        [tabindex]="store.view().view === option.view ? 0 : -1"
+        (click)="select(option.view)"
+        (keydown)="onTabKey($event, i)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  <div role="tabpanel" [id]="'panel-' + store.view().view" [attr.aria-labelledby]="'tab-' + store.view().view">
+    <cc-error-alert [error]="store.pickUpError()" />
+
+    <cc-page-state
+      [state]="store.state()"
+      [empty]="store.claims().length === 0"
+      [emptyMessage]="store.view().emptyMessage"
+      loadingMessage="Loading claims…"
+      (retry)="store.reload()"
+    >
+      <div class="cc-table-wrapper">
+        <table class="cc-table">
+          <caption>
+            {{ store.view().label }}: {{ store.total() }} {{ store.total() === 1 ? 'claim' : 'claims' }}, oldest first
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Claim</th>
+              <th scope="col">Status</th>
+              <th scope="col">Claimant</th>
+              <th scope="col">Cover</th>
+              <th scope="col">Reported</th>
+              <th scope="col" class="cc-numeric">Claimed</th>
+              <th scope="col">Handled by</th>
+              <th scope="col"><span class="cc-visually-hidden">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (claim of store.claims(); track claim.id) {
+              <tr>
+                <th scope="row"><a [routerLink]="['..', 'claims', claim.id]">{{ claim.claimNumber }}</a></th>
+                <td><cc-status-badge [status]="claim.status" /></td>
+                <td>{{ claim.claimantName }}</td>
+                <td>{{ lineLabels[claim.lineOfBusiness] }} · {{ claim.countryCode }}</td>
+                <td>{{ claim.submittedAt | date: 'mediumDate' }}</td>
+                <td class="cc-numeric">{{ claim.claimedAmount | currency: claim.currency : 'code' }}</td>
+                <td>{{ claim.assignedOfficerName ?? '—' }}</td>
+                <td>
+                  @if (claim.status === 'SUBMITTED') {
+                    <button
+                      type="button"
+                      class="cc-button"
+                      [disabled]="store.pickingUp()"
+                      (click)="pickUp(claim.id)"
+                      [attr.aria-label]="'Pick up claim ' + claim.claimNumber"
+                    >
+                      Pick up
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </cc-page-state>
+  </div>
+</section>

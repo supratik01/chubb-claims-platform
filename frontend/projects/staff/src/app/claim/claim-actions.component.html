@@ -1,0 +1,96 @@
+@if (can().has('PICK_UP')) {
+  <div class="action">
+    <p>This claim is waiting in the queue. Pick it up to start the review; it will be assigned to you.</p>
+    <button type="button" class="cc-button" [disabled]="busy()" (click)="pickUp.emit()">Pick up this claim</button>
+  </div>
+}
+
+@if (can().has('REQUEST_INFORMATION')) {
+  <form class="action" [formGroup]="questionForm" (ngSubmit)="sendQuestion()" novalidate>
+    <h3>Ask the claimant for more information</h3>
+    <div class="cc-field">
+      <label for="question">Question for the claimant</label>
+      <textarea
+        id="question"
+        formControlName="question"
+        maxlength="1000"
+        [attr.aria-invalid]="questionInvalid() ? 'true' : null"
+        [attr.aria-describedby]="questionInvalid() ? 'question-error' : 'question-hint'"
+      ></textarea>
+      <span id="question-hint" class="cc-field__hint">The claim will wait for the claimant until they answer.</span>
+      @if (questionInvalid()) {
+        <span id="question-error" class="cc-field__error">Write a question of at least 5 characters.</span>
+      }
+    </div>
+    <button type="submit" class="cc-button cc-button--secondary" [disabled]="busy()">Send question</button>
+  </form>
+}
+
+@if (can().has('DECIDE')) {
+  <form class="action" [formGroup]="decisionForm" (ngSubmit)="recordDecision()" novalidate>
+    <h3>Decision</h3>
+    <fieldset class="outcome">
+      <legend>Outcome</legend>
+      <label><input type="radio" formControlName="outcome" value="APPROVED" /> Approve</label>
+      <label><input type="radio" formControlName="outcome" value="REJECTED" /> Reject</label>
+    </fieldset>
+
+    @if (outcome() === 'APPROVED') {
+      <div class="cc-field">
+        <label for="approvedAmount">Approved amount ({{ claim().currency }})</label>
+        <input
+          id="approvedAmount"
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          step="0.01"
+          formControlName="approvedAmount"
+          [attr.aria-invalid]="amountError() ? 'true' : null"
+          [attr.aria-describedby]="amountError() ? 'approvedAmount-error' : 'approvedAmount-hint'"
+        />
+        @if (claim().sumInsured != null) {
+          <span id="approvedAmount-hint" class="cc-field__hint">
+            Claimed {{ claim().claimedAmount | currency: claim().currency : 'code' }}; sum insured
+            {{ claim().sumInsured | currency: claim().currency : 'code' }}.
+          </span>
+        }
+        @if (amountError(); as error) {
+          <span id="approvedAmount-error" class="cc-field__error">{{ error }}</span>
+        }
+      </div>
+    }
+
+    <div class="cc-field">
+      <label for="reason">{{ outcome() === 'APPROVED' ? 'Note for the claimant (optional)' : 'Reason for rejection' }}</label>
+      <textarea
+        id="reason"
+        formControlName="reason"
+        maxlength="1000"
+        [attr.aria-invalid]="reasonError() ? 'true' : null"
+        [attr.aria-describedby]="reasonError() ? 'reason-error' : null"
+      ></textarea>
+      @if (reasonError(); as error) {
+        <span id="reason-error" class="cc-field__error">{{ error }}</span>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="cc-button"
+      [class.cc-button--danger]="outcome() === 'REJECTED'"
+      [disabled]="busy()"
+    >
+      {{ outcome() === 'APPROVED' ? 'Approve claim' : 'Reject claim' }}
+    </button>
+  </form>
+}
+
+@if (can().has('SETTLE')) {
+  <div class="action">
+    <p>
+      Approved for {{ claim().approvedAmount | currency: claim().currency : 'code' }}. Record the payment once it has
+      been made; the claim will close.
+    </p>
+    <button type="button" class="cc-button" [disabled]="busy()" (click)="settle.emit()">Record payment</button>
+  </div>
+}

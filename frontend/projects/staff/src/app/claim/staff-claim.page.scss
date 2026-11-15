@@ -1,0 +1,21 @@
+.claim-header {
+  margin-top: var(--cc-space-4);
+  justify-content: flex-start;
+}
+
+.layout {
+  display: grid;
+  gap: var(--cc-space-6);
+  grid-template-columns: minmax(0, 3fr) minmax(18rem, 2fr);
+  align-items: start;
+}
+
+@media (max-width: 56rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.actions {
+  border-top: 4px solid var(--cc-color-primary);
+}

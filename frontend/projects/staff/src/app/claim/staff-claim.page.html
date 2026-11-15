@@ -1,0 +1,52 @@
+<section class="cc-page">
+  <a routerLink="../../queue">Back to the work queue</a>
+
+  <cc-page-state [state]="store.state()" loadingMessage="Loading claim…" (retry)="store.reload()">
+    @if (store.claim(); as claim) {
+      <header class="cc-page-header claim-header">
+        <h1>Claim {{ claim.claimNumber }}</h1>
+        <cc-status-badge [status]="claim.status" />
+      </header>
+
+      <div class="layout">
+        <div>
+          <section class="cc-card" aria-labelledby="details-heading">
+            <h2 id="details-heading">Claim details</h2>
+            <cc-claim-facts [claim]="claim" />
+          </section>
+
+          <section class="cc-card" aria-labelledby="questions-heading">
+            <h2 id="questions-heading">Information requests</h2>
+            <cc-information-requests [requests]="claim.informationRequests" />
+          </section>
+        </div>
+
+        <div>
+          <section class="cc-card actions" aria-labelledby="actions-heading">
+            <h2 id="actions-heading">Actions</h2>
+            <cc-error-alert [error]="store.error()" />
+            @if (store.waitingReason(); as reason) {
+              <p class="cc-muted">{{ reason }}</p>
+            } @else {
+              <staff-claim-actions
+                [claim]="claim"
+                [actions]="store.actions()"
+                [busy]="store.busy()"
+                (pickUp)="store.pickUp()"
+                (requestInformation)="store.requestInformation($event)"
+                (approve)="approve($event)"
+                (reject)="store.reject($event)"
+                (settle)="store.settle()"
+              />
+            }
+          </section>
+
+          <section class="cc-card" aria-labelledby="history-heading">
+            <h2 id="history-heading">Status history</h2>
+            <cc-status-timeline [entries]="claim.statusHistory" />
+          </section>
+        </div>
+      </div>
+    }
+  </cc-page-state>
+</section>
