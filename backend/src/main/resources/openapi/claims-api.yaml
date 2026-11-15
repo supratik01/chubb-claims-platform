@@ -1,0 +1,597 @@
+openapi: 3.0.3
+info:
+  title: Chubb APAC Claims API
+  version: 1.0.0
+  description: |
+    REST contract between the claims service and the Angular frontend.
+
+    This file is the source of truth. Backend integration tests validate responses against it and the
+    frontend's TypeScript types are generated from it.
+
+    Authentication: call `POST /auth/login`, then send `Authorization: Bearer <accessToken>` on every other request.
+    Errors: every error response is an RFC 9457 problem document (`application/problem+json`).
+servers:
+  - url: /api/v1
+tags:
+  - name: Auth
+  - name: Policies
+  - name: Claims
+  - name: Claim workflow
+  - name: Dashboard
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Exchange a username and password for an access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /policies:
+    get:
+      tags: [Policies]
+      operationId: listMyPolicies
+      summary: List the signed-in claimant's policies
+      description: Role CLAIMANT. Used to choose the policy when reporting an incident.
+      responses:
+        '200':
+          description: The claimant's policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PolicySummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /claims:
+    post:
+      tags: [Claims]
+      operationId: submitClaim
+      summary: Report an incident
+      description: Role CLAIMANT. Creates a claim in status SUBMITTED against one of the caller's own policies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmitClaimRequest' }
+      responses:
+        '201':
+          description: Claim created
+          headers:
+            Location:
+              description: URL of the new claim
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClaimDetail' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/BusinessRuleViolated' }
+    get:
+      tags: [Claims]
+      operationId: listClaims
+      summary: List claims
+      description: |
+        Claimants always receive only their own claims; `assignment` is ignored for them.
+        Staff receive claims filtered by `assignment` and `status`. Results are ordered oldest first, so the
+        claim that has waited longest is at the top of a work queue.
+      parameters:
+        - name: assignment
+          in: query
+          description: Staff only. UNASSIGNED is the queue of new claims; MINE is the caller's own work.
+          schema:
+            type: string
+            enum: [ALL, MINE, UNASSIGNED]
+            default: ALL
+        - name: status
+          in: query
+          description: Return only claims in one of these statuses. Omit for all statuses.
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/ClaimStatus' }
+          style: form
+          explode: true
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: size
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: One page of claims
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClaimPage' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /claims/{claimId}:
+    get:
+      tags: [Claims]
+      operationId: getClaim
+      summary: Get one claim with its status history and information requests
+      description: A claimant asking for someone else's claim receives 404, so claim identifiers cannot be probed.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      responses:
+        '200':
+          description: The claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClaimDetail' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /claims/{claimId}/assignment:
+    post:
+      tags: [Claim workflow]
+      operationId: pickUpClaim
+      summary: Pick up a claim
+      description: Staff. Assigns the claim to the caller and moves it from SUBMITTED to UNDER_REVIEW.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      responses:
+        '200': { $ref: '#/components/responses/ClaimUpdated' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /claims/{claimId}/information-requests:
+    post:
+      tags: [Claim workflow]
+      operationId: requestInformation
+      summary: Ask the claimant for more information
+      description: Assigned officer or a manager. Moves the claim from UNDER_REVIEW to INFO_REQUESTED.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateInformationRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/ClaimUpdated' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /claims/{claimId}/information-requests/{requestId}/response:
+    post:
+      tags: [Claim workflow]
+      operationId: respondToInformationRequest
+      summary: Answer an information request
+      description: The claimant who owns the claim. Moves the claim from INFO_REQUESTED back to UNDER_REVIEW.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+        - name: requestId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InformationResponse' }
+      responses:
+        '200': { $ref: '#/components/responses/ClaimUpdated' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /claims/{claimId}/decision:
+    post:
+      tags: [Claim workflow]
+      operationId: decideClaim
+      summary: Approve or reject a claim
+      description: |
+        Assigned officer or a manager. The claim must be UNDER_REVIEW.
+        APPROVED requires `approvedAmount`, which may not exceed the policy's sum insured.
+        REJECTED requires `reason`.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DecisionRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/ClaimUpdated' }
+        '400': { $ref: '#/components/responses/ValidationFailed' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRuleViolated' }
+
+  /claims/{claimId}/settlement:
+    post:
+      tags: [Claim workflow]
+      operationId: settleClaim
+      summary: Record that an approved claim has been paid
+      description: Assigned officer or a manager. Moves the claim from APPROVED to SETTLED.
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      responses:
+        '200': { $ref: '#/components/responses/ClaimUpdated' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /dashboard/workload:
+    get:
+      tags: [Dashboard]
+      operationId: getWorkload
+      summary: Team workload by officer and status
+      description: Staff. Read live from the claim table.
+      responses:
+        '200':
+          description: Workload summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkloadSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /dashboard/exposure:
+    get:
+      tags: [Dashboard]
+      operationId: getExposure
+      summary: Open claims and outstanding liability exposure
+      description: |
+        Role CLAIMS_MANAGER. Read from a summary maintained asynchronously from Kafka events, so figures may lag a
+        status change by a moment. Amounts are reported per currency and never converted.
+      responses:
+        '200':
+          description: Exposure summary
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExposureSummary' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ClaimId:
+      name: claimId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    ClaimUpdated:
+      description: The claim after the change
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ClaimDetail' }
+    ValidationFailed:
+      description: The request is malformed or a field is invalid (code VALIDATION_FAILED)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing, invalid or expired credentials (code UNAUTHENTICATED or INVALID_CREDENTIALS)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: The caller's role or relationship to the claim does not allow this (code ACCESS_DENIED)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: No such resource is visible to the caller (code NOT_FOUND)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: |
+        The claim's current status does not allow this action (code INVALID_STATUS_TRANSITION), or someone else
+        changed the claim first (code CONCURRENT_MODIFICATION)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    BusinessRuleViolated:
+      description: The request is well formed but breaks a business rule (code BUSINESS_RULE_VIOLATED)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  schemas:
+    Role:
+      type: string
+      enum: [CLAIMANT, CLAIMS_OFFICER, CLAIMS_MANAGER]
+
+    ClaimStatus:
+      type: string
+      enum: [SUBMITTED, UNDER_REVIEW, INFO_REQUESTED, APPROVED, REJECTED, SETTLED]
+
+    LineOfBusiness:
+      type: string
+      enum: [MOTOR, PROPERTY]
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string, minLength: 1, maxLength: 100 }
+        password: { type: string, minLength: 1, maxLength: 200, format: password }
+
+    LoginResponse:
+      type: object
+      required: [accessToken, tokenType, expiresInSeconds, user]
+      properties:
+        accessToken: { type: string }
+        tokenType: { type: string, enum: [Bearer] }
+        expiresInSeconds: { type: integer, format: int64 }
+        user: { $ref: '#/components/schemas/UserSummary' }
+
+    UserSummary:
+      type: object
+      required: [id, displayName, role]
+      properties:
+        id: { type: string, format: uuid }
+        displayName: { type: string }
+        role: { $ref: '#/components/schemas/Role' }
+
+    PolicySummary:
+      type: object
+      required: [id, policyNumber, lineOfBusiness, countryCode, currency, sumInsured, coverStart, coverEnd]
+      properties:
+        id: { type: string, format: uuid }
+        policyNumber: { type: string }
+        lineOfBusiness: { $ref: '#/components/schemas/LineOfBusiness' }
+        countryCode: { type: string, description: ISO 3166-1 alpha-2, example: SG }
+        currency: { type: string, description: ISO 4217, example: SGD }
+        sumInsured: { type: number }
+        coverStart: { type: string, format: date }
+        coverEnd: { type: string, format: date }
+
+    SubmitClaimRequest:
+      type: object
+      required: [policyId, incidentDate, description, claimedAmount]
+      properties:
+        policyId: { type: string, format: uuid }
+        incidentDate:
+          type: string
+          format: date
+          description: Must not be in the future and must fall inside the policy's cover period.
+        incidentLocation: { type: string, maxLength: 200 }
+        description: { type: string, minLength: 10, maxLength: 2000 }
+        claimedAmount:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          description: In the policy's currency.
+
+    ClaimSummary:
+      type: object
+      required:
+        - id
+        - claimNumber
+        - policyNumber
+        - lineOfBusiness
+        - countryCode
+        - status
+        - claimedAmount
+        - currency
+        - incidentDate
+        - claimantName
+        - submittedAt
+        - updatedAt
+      properties:
+        id: { type: string, format: uuid }
+        claimNumber: { type: string, example: CLM-2026-000042 }
+        policyNumber: { type: string }
+        lineOfBusiness: { $ref: '#/components/schemas/LineOfBusiness' }
+        countryCode: { type: string }
+        status: { $ref: '#/components/schemas/ClaimStatus' }
+        claimedAmount: { type: number }
+        currency: { type: string }
+        incidentDate: { type: string, format: date }
+        claimantName: { type: string }
+        assignedOfficerId: { type: string, format: uuid, nullable: true }
+        assignedOfficerName: { type: string, nullable: true }
+        submittedAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ClaimDetail:
+      allOf:
+        - $ref: '#/components/schemas/ClaimSummary'
+        - type: object
+          required: [description, statusHistory, informationRequests]
+          properties:
+            description: { type: string }
+            incidentLocation: { type: string, nullable: true }
+            sumInsured:
+              type: number
+              nullable: true
+              description: Staff only; null for claimants.
+            reserveAmount:
+              type: number
+              nullable: true
+              description: Current estimate of what remains to be paid. Staff only; null for claimants.
+            approvedAmount: { type: number, nullable: true }
+            decisionReason: { type: string, nullable: true }
+            statusHistory:
+              type: array
+              items: { $ref: '#/components/schemas/StatusHistoryEntry' }
+            informationRequests:
+              type: array
+              items: { $ref: '#/components/schemas/InformationRequest' }
+
+    StatusHistoryEntry:
+      type: object
+      required: [toStatus, changedByName, changedAt]
+      properties:
+        fromStatus:
+          allOf: [{ $ref: '#/components/schemas/ClaimStatus' }]
+          nullable: true
+        toStatus: { $ref: '#/components/schemas/ClaimStatus' }
+        changedByName: { type: string }
+        note: { type: string, nullable: true }
+        changedAt: { type: string, format: date-time }
+
+    InformationRequest:
+      type: object
+      required: [id, question, requestedByName, requestedAt]
+      properties:
+        id: { type: string, format: uuid }
+        question: { type: string }
+        requestedByName: { type: string }
+        requestedAt: { type: string, format: date-time }
+        response: { type: string, nullable: true }
+        respondedAt: { type: string, format: date-time, nullable: true }
+
+    CreateInformationRequest:
+      type: object
+      required: [question]
+      properties:
+        question: { type: string, minLength: 5, maxLength: 1000 }
+
+    InformationResponse:
+      type: object
+      required: [response]
+      properties:
+        response: { type: string, minLength: 1, maxLength: 2000 }
+
+    DecisionRequest:
+      type: object
+      required: [outcome]
+      properties:
+        outcome:
+          type: string
+          enum: [APPROVED, REJECTED]
+        approvedAmount:
+          type: number
+          nullable: true
+          description: Required when outcome is APPROVED.
+        reason:
+          type: string
+          nullable: true
+          maxLength: 1000
+          description: Required when outcome is REJECTED; optional note when APPROVED.
+
+    ClaimPage:
+      type: object
+      required: [items, page, size, totalItems, totalPages]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ClaimSummary' }
+        page: { type: integer }
+        size: { type: integer }
+        totalItems: { type: integer, format: int64 }
+        totalPages: { type: integer }
+
+    WorkloadSummary:
+      type: object
+      required: [unassignedCount, officers]
+      properties:
+        unassignedCount: { type: integer, format: int64 }
+        officers:
+          type: array
+          items: { $ref: '#/components/schemas/OfficerWorkload' }
+
+    OfficerWorkload:
+      type: object
+      required: [officerId, officerName, underReview, awaitingInformation, awaitingSettlement, closed]
+      properties:
+        officerId: { type: string, format: uuid }
+        officerName: { type: string }
+        underReview: { type: integer, format: int64, description: Waiting on the officer. }
+        awaitingInformation: { type: integer, format: int64, description: Waiting on the claimant. }
+        awaitingSettlement: { type: integer, format: int64, description: Approved, payment not yet recorded. }
+        closed: { type: integer, format: int64, description: Rejected or settled. }
+
+    ExposureSummary:
+      type: object
+      required: [totals, breakdown]
+      properties:
+        totals:
+          type: array
+          description: One entry per currency.
+          items: { $ref: '#/components/schemas/CurrencyExposure' }
+        breakdown:
+          type: array
+          items: { $ref: '#/components/schemas/ExposureLine' }
+
+    CurrencyExposure:
+      type: object
+      required: [currency, openClaims, outstandingAmount]
+      properties:
+        currency: { type: string }
+        openClaims: { type: integer, format: int64 }
+        outstandingAmount: { type: number }
+
+    ExposureLine:
+      type: object
+      required: [countryCode, lineOfBusiness, currency, openClaims, outstandingAmount, updatedAt]
+      properties:
+        countryCode: { type: string }
+        lineOfBusiness: { $ref: '#/components/schemas/LineOfBusiness' }
+        currency: { type: string }
+        openClaims: { type: integer, format: int64 }
+        outstandingAmount: { type: number }
+        updatedAt: { type: string, format: date-time }
+
+    Problem:
+      type: object
+      description: RFC 9457 problem details with two extensions, `code` and `errors`.
+      required: [title, status, code]
+      properties:
+        type: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        code:
+          type: string
+          description: Stable machine-readable error code.
+          enum:
+            - VALIDATION_FAILED
+            - UNAUTHENTICATED
+            - INVALID_CREDENTIALS
+            - ACCESS_DENIED
+            - NOT_FOUND
+            - INVALID_STATUS_TRANSITION
+            - CONCURRENT_MODIFICATION
+            - BUSINESS_RULE_VIOLATED
+            - INTERNAL_ERROR
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, message]
+            properties:
+              field: { type: string }
+              message: { type: string }
