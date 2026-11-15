@@ -78,17 +78,15 @@ describe('ReportIncidentPage', () => {
     set('#description', 'Another car reversed into my parked car.');
     set('#claimedAmount', '4200');
     await submit();
-    http
-      .expectOne('/api/v1/claims')
-      .flush(
-        {
-          status: 422,
-          title: 'Unprocessable',
-          code: 'BUSINESS_RULE_VIOLATED',
-          detail: 'The policy is not active',
-        },
-        { status: 422, statusText: 'Unprocessable Content' },
-      );
+    http.expectOne('/api/v1/claims').flush(
+      {
+        status: 422,
+        title: 'Unprocessable',
+        code: 'BUSINESS_RULE_VIOLATED',
+        detail: 'The policy is not active',
+      },
+      { status: 422, statusText: 'Unprocessable Content' },
+    );
     await fixture.whenStable();
 
     expect(element.querySelector('[role="alert"]')?.textContent).toContain(

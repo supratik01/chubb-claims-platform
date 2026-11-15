@@ -78,17 +78,15 @@ describe('LoginPage', () => {
     type('#username', 'claimant.mei');
     type('#password', 'wrong');
     await submit();
-    http
-      .expectOne('/api/v1/auth/login')
-      .flush(
-        {
-          status: 401,
-          title: 'Unauthorized',
-          code: 'INVALID_CREDENTIALS',
-          detail: 'Invalid username or password',
-        },
-        { status: 401, statusText: 'Unauthorized' },
-      );
+    http.expectOne('/api/v1/auth/login').flush(
+      {
+        status: 401,
+        title: 'Unauthorized',
+        code: 'INVALID_CREDENTIALS',
+        detail: 'Invalid username or password',
+      },
+      { status: 401, statusText: 'Unauthorized' },
+    );
     await fixture.whenStable();
 
     expect(element.querySelector('[role="alert"]')?.textContent).toContain(
