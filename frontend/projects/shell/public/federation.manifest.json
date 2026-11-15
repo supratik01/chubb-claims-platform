@@ -1,0 +1,4 @@
+{
+  "claimant": "http://localhost:4201/remoteEntry.json",
+  "staff": "http://localhost:4202/remoteEntry.json"
+}
