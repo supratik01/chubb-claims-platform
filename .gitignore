@@ -1,0 +1,38 @@
+# Build output
+target/
+dist/
+out/
+build/
+.angular/
+coverage/
+test-results/
+playwright-report/
+
+# Dependencies
+node_modules/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+.DS_Store
+Thumbs.db
+
+# Secrets and local overrides (configuration comes from environment variables)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# Local Claude Code settings (the AI journal in .claude/ is committed on purpose)
+.claude/settings.local.json
+
+# Logs
+*.log
+npm-debug.log*
