@@ -1,0 +1,317 @@
+// Design tokens and base styles shared by the shell and both micro-frontends.
+// Every colour pair used for text meets WCAG AA contrast (4.5:1) in both light and dark mode; the figures are in
+// the comments. Components use the custom properties, never raw colours, so the theme changes in one place.
+
+:root {
+  color-scheme: light dark;
+
+  --cc-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --cc-space-1: 0.25rem;
+  --cc-space-2: 0.5rem;
+  --cc-space-3: 0.75rem;
+  --cc-space-4: 1rem;
+  --cc-space-6: 1.5rem;
+  --cc-space-8: 2rem;
+  --cc-radius: 6px;
+  --cc-shadow: 0 1px 2px rgb(16 24 40 / 8%);
+
+  --cc-color-bg: #f5f7fa;
+  --cc-color-surface: #ffffff;
+  --cc-color-text: #1a2433; // 15.6:1 on surface
+  --cc-color-text-muted: #4a5568; // 7.5:1 on surface
+  --cc-color-border: #c9d1dc;
+  --cc-color-primary: #1f4e8c; // 8.3:1 with --cc-color-on-primary
+  --cc-color-primary-hover: #173d6e;
+  --cc-color-on-primary: #ffffff;
+  --cc-color-focus: #1d4ed8; // 6.7:1 on surface, well above the 3:1 needed for a focus ring
+  --cc-color-danger: #b42318; // 6.6:1 on surface
+  --cc-color-on-danger: #ffffff;
+
+  // Status tones: text on its own tint
+  --cc-tone-info-fg: #175cd3; // 5.6:1 on its background
+  --cc-tone-info-bg: #eff8ff;
+  --cc-tone-progress-fg: #5925dc; // 7.0:1
+  --cc-tone-progress-bg: #f4f3ff;
+  --cc-tone-warning-fg: #93370d; // 7.2:1
+  --cc-tone-warning-bg: #fffaeb;
+  --cc-tone-success-fg: #067647; // 5.4:1
+  --cc-tone-success-bg: #ecfdf3;
+  --cc-tone-danger-fg: #b42318; // 6.0:1
+  --cc-tone-danger-bg: #fef3f2;
+  --cc-tone-neutral-fg: #344054; // 9.5:1
+  --cc-tone-neutral-bg: #f2f4f7;
+}
+
+@mixin dark-tokens {
+  --cc-color-bg: #0f1720;
+  --cc-color-surface: #17212b;
+  --cc-color-text: #e6edf3; // 13.8:1 on surface
+  --cc-color-text-muted: #a6b3c2; // 7.6:1 on surface
+  --cc-color-border: #334155;
+  --cc-color-primary: #8ab4f8; // 8.9:1 with --cc-color-on-primary
+  --cc-color-primary-hover: #aecbfa;
+  --cc-color-on-primary: #0b1220;
+  --cc-color-focus: #8ab4f8;
+  --cc-color-danger: #f97066;
+  --cc-color-on-danger: #0b1220;
+
+  --cc-tone-info-fg: #9ecbff; // each dark tone is 8:1 or better on its background
+  --cc-tone-info-bg: #102a43;
+  --cc-tone-progress-fg: #c3b8fe;
+  --cc-tone-progress-bg: #27115f;
+  --cc-tone-warning-fg: #fec84b;
+  --cc-tone-warning-bg: #3d2a07;
+  --cc-tone-success-fg: #75e0a7;
+  --cc-tone-success-bg: #053321;
+  --cc-tone-danger-fg: #fda29b;
+  --cc-tone-danger-bg: #431512;
+  --cc-tone-neutral-fg: #d0d5dd;
+  --cc-tone-neutral-bg: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include dark-tokens;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--cc-font);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cc-color-text);
+  background: var(--cc-color-bg);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 var(--cc-space-4);
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+}
+
+a {
+  color: var(--cc-color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid var(--cc-color-focus);
+  outline-offset: 2px;
+}
+
+.cc-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cc-page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--cc-space-6) var(--cc-space-4) var(--cc-space-8);
+}
+
+.cc-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cc-space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--cc-space-6);
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.cc-muted {
+  color: var(--cc-color-text-muted);
+}
+
+.cc-card {
+  background: var(--cc-color-surface);
+  border: 1px solid var(--cc-color-border);
+  border-radius: var(--cc-radius);
+  box-shadow: var(--cc-shadow);
+  padding: var(--cc-space-6);
+  margin-bottom: var(--cc-space-6);
+}
+
+.cc-grid {
+  display: grid;
+  gap: var(--cc-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  align-items: start;
+}
+
+// Buttons
+.cc-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cc-space-2);
+  min-height: 2.5rem; // comfortable touch target
+  padding: var(--cc-space-2) var(--cc-space-4);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--cc-radius);
+  border: 1px solid var(--cc-color-primary);
+  background: var(--cc-color-primary);
+  color: var(--cc-color-on-primary);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--cc-color-primary-hover);
+    border-color: var(--cc-color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--secondary {
+    background: transparent;
+    color: var(--cc-color-primary);
+
+    &:hover:not(:disabled) {
+      background: var(--cc-tone-info-bg);
+      color: var(--cc-color-primary);
+    }
+  }
+
+  &--danger {
+    background: var(--cc-color-danger);
+    border-color: var(--cc-color-danger);
+    color: var(--cc-color-on-danger);
+
+    &:hover:not(:disabled) {
+      background: var(--cc-color-danger);
+      border-color: var(--cc-color-danger);
+      filter: brightness(0.92);
+    }
+  }
+}
+
+.cc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cc-space-3);
+  align-items: center;
+}
+
+// Forms
+.cc-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cc-space-1);
+  margin-bottom: var(--cc-space-4);
+
+  label {
+    font-weight: 600;
+  }
+
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: var(--cc-color-text);
+    background: var(--cc-color-surface);
+    border: 1px solid var(--cc-color-text-muted); // 3:1 or better against the surface, as required for inputs
+    border-radius: var(--cc-radius);
+    padding: var(--cc-space-2) var(--cc-space-3);
+    min-height: 2.5rem;
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  [aria-invalid='true'] {
+    border-color: var(--cc-color-danger);
+    border-width: 2px;
+  }
+}
+
+.cc-field__hint {
+  color: var(--cc-color-text-muted);
+  font-size: 0.875rem;
+}
+
+.cc-field__error {
+  color: var(--cc-color-danger);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+// Tables
+.cc-table-wrapper {
+  overflow-x: auto;
+}
+
+.cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--cc-color-surface);
+
+  caption {
+    text-align: left;
+    padding-bottom: var(--cc-space-2);
+    color: var(--cc-color-text-muted);
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: var(--cc-space-3);
+    border-bottom: 1px solid var(--cc-color-border);
+    vertical-align: middle;
+  }
+
+  th {
+    font-size: 0.875rem;
+    color: var(--cc-color-text-muted);
+    font-weight: 600;
+  }
+
+  .cc-numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
