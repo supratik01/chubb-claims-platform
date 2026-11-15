@@ -251,3 +251,47 @@ micro-frontend at runtime through the relative federation manifest.
 **Candidate review:**
 
 ---
+
+## Entry 09 — 2026-11-15 15:55 IST — End-to-end and accessibility tests, verification, documentation
+
+**Instruction:** Step 3 tests (one end-to-end test per key flow), Step 4 (verify from a fresh clone, check R1–R17 and
+every requirement, check for secrets and junk) and Step 5 (README, walkthrough, optional Postman collection).
+
+**Produced:** Playwright tests for the lifecycle, rejection and access by role; axe-core scans of every main screen
+in both colour schemes and a keyboard test; a Postman collection with 43 assertions; `NOTES.md` decisions D20 to D24
+and assumptions 10 and 11; `README.md`; `docs/walkthrough.md` with the verification results and both checklists.
+
+**Results from a fresh clone of the final code:** 80 seconds from `docker compose build --no-cache` to all services
+healthy; backend 78 of 78, frontend 83 of 83, end-to-end 14 of 14, Postman 43 of 43 assertions.
+
+**Alternatives considered:**
+- *Report the 80-second figure as the examiner's start-up time.* Rejected as misleading: base images and the Maven and
+  npm download caches were still warm, and clearing them meant pruning Docker build cache that other projects on this
+  machine share. Measured the cold downloads separately in clean containers instead, and reported the cold total as
+  an estimate, labelled as one.
+- *Treat accessibility as covered by labelled selectors and computed contrast.* Added an automated axe-core scan and
+  a keyboard test instead, because "basics" claimed without a check is an assertion, not evidence.
+- *Publish PostgreSQL and Kafka ports for local tools.* Kept them internal (D22).
+
+**Corrections to my own output:**
+1. The lifecycle test read the policy options before the list had loaded and failed once; the helper now waits for
+   the option. The test was wrong, not the app.
+2. While moving that helper I cut off the end of the support file, removing the exposure helper; restored it before
+   the next run.
+3. The keyboard test failed twice. The first failure was my test pressing Tab before the app had rendered. The second
+   was a real bug: the shell moved focus to the main region on every navigation, including the query-only navigation
+   that switching work-queue tabs performs, so arrow keys threw focus out of the tab list. Traced focus step by step
+   before changing anything; fixed the shell to move focus only when the path changes, with unit tests.
+4. My first README draft gave a start-up time before it had been measured; replaced it with the measured figure and
+   the labelled estimate. The walkthrough also claimed validation errors were "announced" (they are read when focus
+   reaches the field) and hard-coded a commit count that would go stale; both corrected.
+5. A Prettier-only commit was described as touching one file when it touched two; amended the message before
+   anything else was committed on top.
+
+**Found and not fixed (listed under next steps in the walkthrough, as the prompt requires):** published outbox rows
+and processed-event ids are never purged; the lists have no paging controls beyond 100 claims; a failed
+micro-frontend load needs a full page reload to retry.
+
+**Candidate review:**
+
+---
