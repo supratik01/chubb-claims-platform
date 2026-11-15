@@ -1,9 +1,23 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Signal, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Signal,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ErrorAlertComponent, LINE_OF_BUSINESS_LABELS, PageStateComponent, PolicySummary } from '@claims/shared';
+import {
+  ErrorAlertComponent,
+  LINE_OF_BUSINESS_LABELS,
+  PageStateComponent,
+  PolicySummary,
+  MoneyPipe,
+} from '@claims/shared';
 import { incidentDateValidator, latestDateAnywhere } from './incident-date.validator';
 import { ReportIncidentStore } from './report-incident.store';
 
@@ -12,7 +26,14 @@ type Field = 'policyId' | 'incidentDate' | 'incidentLocation' | 'description' | 
 @Component({
   selector: 'claimant-report-incident-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, ErrorAlertComponent, PageStateComponent],
+  imports: [
+    MoneyPipe,
+    ReactiveFormsModule,
+    RouterLink,
+    DatePipe,
+    ErrorAlertComponent,
+    PageStateComponent,
+  ],
   providers: [ReportIncidentStore],
   templateUrl: './report-incident.page.html',
 })
@@ -64,7 +85,9 @@ export class ReportIncidentPage {
   protected submit(): void {
     this.submitted.set(true);
     if (this.form.invalid) {
-      queueMicrotask(() => this.host.nativeElement.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      queueMicrotask(() =>
+        this.host.nativeElement.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
+      );
       return;
     }
     const value = this.form.getRawValue();

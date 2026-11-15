@@ -61,7 +61,10 @@ export class ClaimsApiClient {
   }
 
   requestInformation(claimId: string, body: CreateInformationRequest): Observable<ClaimDetail> {
-    return this.http.post<ClaimDetail>(`${this.baseUrl}/claims/${claimId}/information-requests`, body);
+    return this.http.post<ClaimDetail>(
+      `${this.baseUrl}/claims/${claimId}/information-requests`,
+      body,
+    );
   }
 
   respondToInformationRequest(

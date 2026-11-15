@@ -28,8 +28,14 @@ import { ApiError } from '../api/api-error';
       padding: var(--cc-space-3) var(--cc-space-4);
       margin-bottom: var(--cc-space-4);
     }
-    .alert__message { margin: 0; font-weight: 600; }
-    ul { margin: var(--cc-space-2) 0 0; padding-left: var(--cc-space-6); }
+    .alert__message {
+      margin: 0;
+      font-weight: 600;
+    }
+    ul {
+      margin: var(--cc-space-2) 0 0;
+      padding-left: var(--cc-space-6);
+    }
   `,
 })
 export class ErrorAlertComponent {

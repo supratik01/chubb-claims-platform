@@ -18,3 +18,4 @@ export * from './lib/ui/page-state.component';
 export * from './lib/ui/status-timeline.component';
 export * from './lib/ui/information-requests.component';
 export * from './lib/ui/claim-facts.component';
+export * from './lib/ui/money.pipe';

@@ -30,7 +30,11 @@
           {{ user.displayName }}
           <span class="account__role">{{ roleLabel() }}</span>
         </span>
-        <button type="button" class="cc-button cc-button--secondary account__signout" (click)="signOut()">
+        <button
+          type="button"
+          class="cc-button cc-button--secondary account__signout"
+          (click)="signOut()"
+        >
           Sign out
         </button>
       </div>

@@ -1,7 +1,12 @@
 @if (can().has('PICK_UP')) {
   <div class="action">
-    <p>This claim is waiting in the queue. Pick it up to start the review; it will be assigned to you.</p>
-    <button type="button" class="cc-button" [disabled]="busy()" (click)="pickUp.emit()">Pick up this claim</button>
+    <p>
+      This claim is waiting in the queue. Pick it up to start the review; it will be assigned to
+      you.
+    </p>
+    <button type="button" class="cc-button" [disabled]="busy()" (click)="pickUp.emit()">
+      Pick up this claim
+    </button>
   </div>
 }
 
@@ -17,12 +22,18 @@
         [attr.aria-invalid]="questionInvalid() ? 'true' : null"
         [attr.aria-describedby]="questionInvalid() ? 'question-error' : 'question-hint'"
       ></textarea>
-      <span id="question-hint" class="cc-field__hint">The claim will wait for the claimant until they answer.</span>
+      <span id="question-hint" class="cc-field__hint"
+        >The claim will wait for the claimant until they answer.</span
+      >
       @if (questionInvalid()) {
-        <span id="question-error" class="cc-field__error">Write a question of at least 5 characters.</span>
+        <span id="question-error" class="cc-field__error"
+          >Write a question of at least 5 characters.</span
+        >
       }
     </div>
-    <button type="submit" class="cc-button cc-button--secondary" [disabled]="busy()">Send question</button>
+    <button type="submit" class="cc-button cc-button--secondary" [disabled]="busy()">
+      Send question
+    </button>
   </form>
 }
 
@@ -50,8 +61,8 @@
         />
         @if (claim().sumInsured != null) {
           <span id="approvedAmount-hint" class="cc-field__hint">
-            Claimed {{ claim().claimedAmount | currency: claim().currency : 'code' }}; sum insured
-            {{ claim().sumInsured | currency: claim().currency : 'code' }}.
+            Claimed {{ claim().claimedAmount | money: claim().currency }}; sum insured
+            {{ claim().sumInsured | money: claim().currency }}.
           </span>
         }
         @if (amountError(); as error) {
@@ -61,7 +72,9 @@
     }
 
     <div class="cc-field">
-      <label for="reason">{{ outcome() === 'APPROVED' ? 'Note for the claimant (optional)' : 'Reason for rejection' }}</label>
+      <label for="reason">{{
+        outcome() === 'APPROVED' ? 'Note for the claimant (optional)' : 'Reason for rejection'
+      }}</label>
       <textarea
         id="reason"
         formControlName="reason"
@@ -88,9 +101,11 @@
 @if (can().has('SETTLE')) {
   <div class="action">
     <p>
-      Approved for {{ claim().approvedAmount | currency: claim().currency : 'code' }}. Record the payment once it has
-      been made; the claim will close.
+      Approved for {{ claim().approvedAmount | money: claim().currency }}. Record the payment once
+      it has been made; the claim will close.
     </p>
-    <button type="button" class="cc-button" [disabled]="busy()" (click)="settle.emit()">Record payment</button>
+    <button type="button" class="cc-button" [disabled]="busy()" (click)="settle.emit()">
+      Record payment
+    </button>
   </div>
 }

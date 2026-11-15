@@ -21,7 +21,11 @@
     }
   </div>
 
-  <div role="tabpanel" [id]="'panel-' + store.view().view" [attr.aria-labelledby]="'tab-' + store.view().view">
+  <div
+    role="tabpanel"
+    [id]="'panel-' + store.view().view"
+    [attr.aria-labelledby]="'tab-' + store.view().view"
+  >
     <cc-error-alert [error]="store.pickUpError()" />
 
     <cc-page-state
@@ -34,7 +38,15 @@
       <div class="cc-table-wrapper">
         <table class="cc-table">
           <caption>
-            {{ store.view().label }}: {{ store.total() }} {{ store.total() === 1 ? 'claim' : 'claims' }}, oldest first
+            {{
+              store.view().label
+            }}:
+            {{
+              store.total()
+            }}
+            {{
+              store.total() === 1 ? 'claim' : 'claims'
+            }}, oldest first
           </caption>
           <thead>
             <tr>
@@ -51,12 +63,14 @@
           <tbody>
             @for (claim of store.claims(); track claim.id) {
               <tr>
-                <th scope="row"><a [routerLink]="['..', 'claims', claim.id]">{{ claim.claimNumber }}</a></th>
+                <th scope="row">
+                  <a [routerLink]="['..', 'claims', claim.id]">{{ claim.claimNumber }}</a>
+                </th>
                 <td><cc-status-badge [status]="claim.status" /></td>
                 <td>{{ claim.claimantName }}</td>
                 <td>{{ lineLabels[claim.lineOfBusiness] }} · {{ claim.countryCode }}</td>
                 <td>{{ claim.submittedAt | date: 'mediumDate' }}</td>
-                <td class="cc-numeric">{{ claim.claimedAmount | currency: claim.currency : 'code' }}</td>
+                <td class="cc-numeric">{{ claim.claimedAmount | money: claim.currency }}</td>
                 <td>{{ claim.assignedOfficerName ?? '—' }}</td>
                 <td>
                   @if (claim.status === 'SUBMITTED') {

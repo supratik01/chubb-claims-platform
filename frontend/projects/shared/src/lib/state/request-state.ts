@@ -68,7 +68,11 @@ export class CommandState {
   readonly pending: Signal<boolean> = this.running.asReadonly();
   readonly error: Signal<ApiError | null> = this.failure.asReadonly();
 
-  run<T>(command: Observable<T>, onSuccess: (result: T) => void, onError?: (error: ApiError) => void): void {
+  run<T>(
+    command: Observable<T>,
+    onSuccess: (result: T) => void,
+    onError?: (error: ApiError) => void,
+  ): void {
     if (untracked(this.running)) return;
     this.running.set(true);
     this.failure.set(null);

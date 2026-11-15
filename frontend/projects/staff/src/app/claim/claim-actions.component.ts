@@ -1,4 +1,3 @@
-import { CurrencyPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,7 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ClaimDetail } from '@claims/shared';
+import { ClaimDetail, MoneyPipe } from '@claims/shared';
 import { ClaimAction } from './claim-actions';
 
 export interface ApprovalInput {
@@ -27,7 +26,7 @@ export interface ApprovalInput {
 @Component({
   selector: 'staff-claim-actions',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, CurrencyPipe],
+  imports: [MoneyPipe, ReactiveFormsModule],
   templateUrl: './claim-actions.component.html',
   styleUrl: './claim-actions.component.scss',
 })
@@ -91,7 +90,8 @@ export class ClaimActionsComponent {
   protected reasonError(): string | null {
     if (!this.decisionSubmitted()) return null;
     const reason = this.decisionForm.controls.reason.value.trim();
-    if (this.outcome() === 'REJECTED' && reason.length === 0) return 'Give the reason for rejecting this claim.';
+    if (this.outcome() === 'REJECTED' && reason.length === 0)
+      return 'Give the reason for rejecting this claim.';
     if (reason.length > 1000) return 'Use at most 1000 characters.';
     return null;
   }

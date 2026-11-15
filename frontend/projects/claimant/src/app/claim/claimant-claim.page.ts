@@ -1,5 +1,12 @@
-import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  untracked,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   ClaimFactsComponent,
@@ -9,6 +16,7 @@ import {
   PageStateComponent,
   StatusBadgeComponent,
   StatusTimelineComponent,
+  MoneyPipe,
 } from '@claims/shared';
 import { ClaimantClaimStore } from './claimant-claim.store';
 import { nextStepFor } from './next-step';
@@ -17,8 +25,8 @@ import { nextStepFor } from './next-step';
   selector: 'claimant-claim-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    MoneyPipe,
     RouterLink,
-    CurrencyPipe,
     ClaimFactsComponent,
     ErrorAlertComponent,
     InformationRequestsComponent,

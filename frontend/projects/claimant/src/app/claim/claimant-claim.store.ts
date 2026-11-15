@@ -1,5 +1,11 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
-import { ClaimDetail, ClaimsApiClient, CommandState, QueryState, refreshWhileVisible } from '@claims/shared';
+import {
+  ClaimDetail,
+  ClaimsApiClient,
+  CommandState,
+  QueryState,
+  refreshWhileVisible,
+} from '@claims/shared';
 import { EMPTY } from 'rxjs';
 
 /** State for one claim as the claimant sees it, and the one thing the claimant can do to it: answer a question. */

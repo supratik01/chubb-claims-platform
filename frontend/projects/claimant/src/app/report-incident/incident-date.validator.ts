@@ -8,7 +8,10 @@ import { PolicySummary } from '@claims/shared';
  * "Today" is the latest calendar date anywhere (UTC+14), matching the backend, so a claimant in a time zone ahead
  * of the browser's is never told that today is in the future.
  */
-export function incidentDateValidator(policy: () => PolicySummary | null, now: () => Date = () => new Date()): ValidatorFn {
+export function incidentDateValidator(
+  policy: () => PolicySummary | null,
+  now: () => Date = () => new Date(),
+): ValidatorFn {
   return (control: AbstractControl<string>): ValidationErrors | null => {
     const value = control.value;
     if (!value) return null;

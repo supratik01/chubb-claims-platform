@@ -54,7 +54,11 @@
     <ul>
       @for (account of demoAccounts; track account.username) {
         <li>
-          <button type="button" class="cc-button cc-button--secondary" (click)="useAccount(account.username)">
+          <button
+            type="button"
+            class="cc-button cc-button--secondary"
+            (click)="useAccount(account.username)"
+          >
             Use {{ account.username }}
           </button>
           <span class="cc-muted">{{ account.description }}</span>

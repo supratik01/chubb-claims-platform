@@ -33,7 +33,9 @@ export class SessionStore {
   readonly user = computed(() => this.session()?.user ?? null);
   readonly role = computed<Role | null>(() => this.session()?.user.role ?? null);
   readonly isAuthenticated = computed(() => this.session() !== null);
-  readonly isStaff = computed(() => this.role() === 'CLAIMS_OFFICER' || this.role() === 'CLAIMS_MANAGER');
+  readonly isStaff = computed(
+    () => this.role() === 'CLAIMS_OFFICER' || this.role() === 'CLAIMS_MANAGER',
+  );
   readonly isManager = computed(() => this.role() === 'CLAIMS_MANAGER');
 
   signIn(username: string, password: string): Observable<UserSummary> {

@@ -18,7 +18,9 @@ import { RequestState } from '../state/request-state';
       @case ('error') {
         <div class="state state--error" role="alert">
           <p>{{ errorMessage() }}</p>
-          <button type="button" class="cc-button cc-button--secondary" (click)="retry.emit()">Try again</button>
+          <button type="button" class="cc-button cc-button--secondary" (click)="retry.emit()">
+            Try again
+          </button>
         </div>
       }
       @default {
@@ -42,10 +44,23 @@ import { RequestState } from '../state/request-state';
       text-align: center;
       color: var(--cc-color-text-muted);
     }
-    .state--error { border-style: solid; border-color: var(--cc-color-danger); color: var(--cc-tone-danger-fg); }
-    .state p { margin: 0 0 var(--cc-space-3); }
-    .state--loading { display: flex; gap: var(--cc-space-3); justify-content: center; align-items: center; }
-    .state--loading { margin: 0; }
+    .state--error {
+      border-style: solid;
+      border-color: var(--cc-color-danger);
+      color: var(--cc-tone-danger-fg);
+    }
+    .state p {
+      margin: 0 0 var(--cc-space-3);
+    }
+    .state--loading {
+      display: flex;
+      gap: var(--cc-space-3);
+      justify-content: center;
+      align-items: center;
+    }
+    .state--loading {
+      margin: 0;
+    }
     .spinner {
       width: 1.25rem;
       height: 1.25rem;
@@ -54,7 +69,11 @@ import { RequestState } from '../state/request-state';
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   `,
 })
 export class PageStateComponent {

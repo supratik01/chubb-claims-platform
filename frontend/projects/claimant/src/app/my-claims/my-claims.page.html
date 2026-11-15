@@ -6,7 +6,8 @@
 
   @if (store.awaitingMe() > 0) {
     <p class="action-banner" role="status">
-      {{ store.awaitingMe() === 1 ? 'One claim needs' : store.awaitingMe() + ' claims need' }} an answer from you.
+      {{ store.awaitingMe() === 1 ? 'One claim needs' : store.awaitingMe() + ' claims need' }} an
+      answer from you.
     </p>
   }
 
@@ -40,7 +41,7 @@
             </div>
             <div>
               <dt>Amount claimed</dt>
-              <dd>{{ claim.claimedAmount | currency: claim.currency : 'code' }}</dd>
+              <dd>{{ claim.claimedAmount | money: claim.currency }}</dd>
             </div>
             <div>
               <dt>Last update</dt>

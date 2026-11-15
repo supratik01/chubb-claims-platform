@@ -65,7 +65,9 @@ export class StaffClaimStore {
   }
 
   approve(approvedAmount: number, note: string | null): void {
-    this.execute((id) => this.api.decideClaim(id, { outcome: 'APPROVED', approvedAmount, reason: note }));
+    this.execute((id) =>
+      this.api.decideClaim(id, { outcome: 'APPROVED', approvedAmount, reason: note }),
+    );
   }
 
   reject(reason: string): void {

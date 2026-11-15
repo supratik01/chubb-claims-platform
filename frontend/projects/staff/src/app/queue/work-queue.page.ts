@@ -1,11 +1,20 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, effect, inject, input, untracked } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  inject,
+  input,
+  untracked,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   ErrorAlertComponent,
   LINE_OF_BUSINESS_LABELS,
   PageStateComponent,
   StatusBadgeComponent,
+  MoneyPipe,
 } from '@claims/shared';
 import { QUEUE_VIEWS, QueueView, queueView } from './queue-views';
 import { WorkQueueStore } from './work-queue.store';
@@ -17,7 +26,14 @@ import { WorkQueueStore } from './work-queue.store';
 @Component({
   selector: 'staff-work-queue-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CurrencyPipe, DatePipe, ErrorAlertComponent, PageStateComponent, StatusBadgeComponent],
+  imports: [
+    MoneyPipe,
+    RouterLink,
+    DatePipe,
+    ErrorAlertComponent,
+    PageStateComponent,
+    StatusBadgeComponent,
+  ],
   providers: [WorkQueueStore],
   templateUrl: './work-queue.page.html',
   styleUrl: './work-queue.page.scss',
@@ -49,7 +65,8 @@ export class WorkQueuePage {
   protected onTabKey(event: KeyboardEvent, index: number): void {
     const offsets: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 };
     let next: number;
-    if (event.key in offsets) next = (index + offsets[event.key] + this.views.length) % this.views.length;
+    if (event.key in offsets)
+      next = (index + offsets[event.key] + this.views.length) % this.views.length;
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = this.views.length - 1;
     else return;
@@ -59,8 +76,9 @@ export class WorkQueuePage {
   }
 
   protected pickUp(claimId: string): void {
-    this.store.pickUp(claimId, (claim) =>
-      void this.router.navigate(['..', 'claims', claim.id], { relativeTo: this.route }),
+    this.store.pickUp(
+      claimId,
+      (claim) => void this.router.navigate(['..', 'claims', claim.id], { relativeTo: this.route }),
     );
   }
 }

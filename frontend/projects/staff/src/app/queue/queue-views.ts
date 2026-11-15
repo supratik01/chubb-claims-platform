@@ -24,7 +24,11 @@ export const QUEUE_VIEWS: readonly QueueViewDefinition[] = [
     view: 'mine',
     label: 'My open claims',
     emptyMessage: 'You have no open claims. Pick one up from the unassigned queue.',
-    query: { assignment: 'MINE', status: ['UNDER_REVIEW', 'INFO_REQUESTED', 'APPROVED'], size: 100 },
+    query: {
+      assignment: 'MINE',
+      status: ['UNDER_REVIEW', 'INFO_REQUESTED', 'APPROVED'],
+      size: 100,
+    },
   },
   {
     view: 'all',

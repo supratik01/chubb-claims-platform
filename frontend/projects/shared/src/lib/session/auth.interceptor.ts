@@ -17,7 +17,9 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   if (!request.url.startsWith(baseUrl)) return next(request);
 
   const token = session.accessToken();
-  const authorised = token ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request;
+  const authorised = token
+    ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : request;
   const isLogin = request.url.endsWith('/auth/login');
 
   return next(authorised).pipe(

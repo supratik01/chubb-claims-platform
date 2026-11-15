@@ -1,7 +1,20 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApiError, ErrorAlertComponent, SessionStore, homeRouteFor, toApiError } from '@claims/shared';
+import {
+  ApiError,
+  ErrorAlertComponent,
+  SessionStore,
+  homeRouteFor,
+  toApiError,
+} from '@claims/shared';
 
 interface DemoAccount {
   readonly username: string;

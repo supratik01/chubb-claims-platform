@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  untracked,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   ClaimFactsComponent,

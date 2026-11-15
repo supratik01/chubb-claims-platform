@@ -13,7 +13,8 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
   UNAUTHENTICATED: 'Your session has ended. Please sign in again.',
   ACCESS_DENIED: 'You do not have permission to do that.',
   NOT_FOUND: 'We could not find that claim, or it is not available to you.',
-  CONCURRENT_MODIFICATION: 'Someone else changed this claim a moment ago. It has been reloaded; please try again.',
+  CONCURRENT_MODIFICATION:
+    'Someone else changed this claim a moment ago. It has been reloaded; please try again.',
   VALIDATION_FAILED: 'Some details need correcting.',
   INTERNAL_ERROR: 'Something went wrong on our side. Please try again in a moment.',
 };
@@ -25,7 +26,12 @@ const MESSAGES: Partial<Record<ErrorCode, string>> = {
  */
 export function toApiError(error: unknown): ApiError {
   if (!(error instanceof HttpErrorResponse)) {
-    return { status: -1, code: null, message: 'Something went wrong. Please try again.', fieldErrors: [] };
+    return {
+      status: -1,
+      code: null,
+      message: 'Something went wrong. Please try again.',
+      fieldErrors: [],
+    };
   }
   if (error.status === 0) {
     return {
@@ -38,7 +44,10 @@ export function toApiError(error: unknown): ApiError {
   const problem = isProblem(error.error) ? error.error : null;
   const code = problem?.code ?? null;
   const message =
-    (code && MESSAGES[code]) ?? problem?.detail ?? problem?.title ?? 'Something went wrong. Please try again.';
+    (code && MESSAGES[code]) ??
+    problem?.detail ??
+    problem?.title ??
+    'Something went wrong. Please try again.';
   return { status: error.status, code, message, fieldErrors: problem?.errors ?? [] };
 }
 

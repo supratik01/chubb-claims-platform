@@ -1,5 +1,11 @@
 import { DestroyRef, Injectable, computed, inject } from '@angular/core';
-import { ClaimDetail, ClaimsApiClient, CommandState, QueryState, SubmitClaimRequest } from '@claims/shared';
+import {
+  ClaimDetail,
+  ClaimsApiClient,
+  CommandState,
+  QueryState,
+  SubmitClaimRequest,
+} from '@claims/shared';
 
 @Injectable()
 export class ReportIncidentStore {

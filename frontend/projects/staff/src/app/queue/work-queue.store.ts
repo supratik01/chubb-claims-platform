@@ -1,5 +1,11 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { ClaimDetail, ClaimsApiClient, CommandState, QueryState, refreshWhileVisible } from '@claims/shared';
+import {
+  ClaimDetail,
+  ClaimsApiClient,
+  CommandState,
+  QueryState,
+  refreshWhileVisible,
+} from '@claims/shared';
 import { QUEUE_VIEWS, QueueViewDefinition } from './queue-views';
 
 @Injectable()
@@ -33,6 +39,8 @@ export class WorkQueueStore {
 
   /** Assigns the claim to the caller. If someone else got there first, the list is refreshed to show it. */
   pickUp(claimId: string, onPickedUp: (claim: ClaimDetail) => void): void {
-    this.pickUpCommand.run(this.api.pickUpClaim(claimId), onPickedUp, () => this.query.load({ background: true }));
+    this.pickUpCommand.run(this.api.pickUpClaim(claimId), onPickedUp, () =>
+      this.query.load({ background: true }),
+    );
   }
 }
