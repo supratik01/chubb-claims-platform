@@ -54,9 +54,9 @@ docker compose up --build
 ```
 
 This builds the backend and frontend images and starts PostgreSQL, Kafka, the claims service and the web server in
-order, each waiting for the one before it to be healthy. From a fresh clone on the development machine (an Apple
-Silicon Mac, base images not yet cached locally for this project) it took about two minutes; see
-[`docs/walkthrough.md`](docs/walkthrough.md#verification) for the measured figure. Then open
+order, each waiting for the one before it to be healthy. From a fresh clone it took 80 seconds on the development
+machine with download caches warm; with nothing cached, expect roughly two and a half to three and a half minutes
+(the measurement and the estimate are in [`docs/walkthrough.md`](docs/walkthrough.md#verification)). Then open
 **http://localhost:4200**.
 
 The demo data is seeded on start-up and reset by `docker compose down` followed by `up` (nothing is kept between
