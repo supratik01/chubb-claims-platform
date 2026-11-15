@@ -1,0 +1,8 @@
+package com.chubb.claims.domain.exception;
+
+public class BusinessRuleViolationException extends DomainException {
+
+    public BusinessRuleViolationException(String message) {
+        super(message);
+    }
+}
