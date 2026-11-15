@@ -47,7 +47,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "shell:esbuild:development"
+          }
         },
         "esbuild": {
           "builder": "@angular/build:application",
@@ -151,7 +154,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "claimant:esbuild:development"
+          }
         },
         "esbuild": {
           "builder": "@angular/build:application",
@@ -254,7 +260,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "staff:esbuild:development"
+          }
         },
         "esbuild": {
           "builder": "@angular/build:application",

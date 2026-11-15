@@ -12,7 +12,8 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "paths": {
-      "@claims/shared": ["./projects/shared/src/public-api.ts"]
+      "@claims/shared": ["./projects/shared/src/public-api.ts"],
+      "@claims/shared/testing": ["./projects/shared/src/testing/index.ts"]
     },
     "target": "ES2022",
     "module": "preserve"
