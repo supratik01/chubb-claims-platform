@@ -2,7 +2,10 @@
 
 A running record of the AI-assisted build of the Chubb APAC claims platform, written as the work happened.
 
-- **AI used:** Claude (Claude Code, model `claude-fable-5-2`), working autonomously from the prompts in `prompts/`.
+- **AI used:** Claude in Claude Code, working autonomously from the prompts in `prompts/`. Two models were used, one
+  per session, as the `Co-Authored-By` lines on the commits show: Claude Fable 5.2 (`claude-fable-5-2`) for entries
+  01 to 06 (design documents and backend), and Claude Opus 5.5 (`claude-opus-5-5`) from entry 07 onwards (frontend,
+  Docker, verification, documentation and publishing).
 - **How to read an entry:** each entry records the instruction being worked on, what the AI produced, the
   alternatives it weighed, and any place it changed approach or corrected its own output.
 - **Candidate review:** the line at the end of every entry is reserved for the candidate. It records what was
@@ -305,8 +308,6 @@ The final verification is convincing because it combines automated tests, end-to
 
 ---
 
----
-
 ## Entry 10 — 2026-11-15 19:12 IST — Publish to GitHub
 
 **Instruction:** After testing the full workflow and seeing every suite pass, publish the repository to GitHub as a
@@ -329,3 +330,32 @@ output or dependencies are tracked; the only credentials in the repository are t
 
 **Candidate review:**
 Publishing the clean repository with its full commit history was appropriate for the assessment. The checks confirmed that secrets, generated files and unrelated inputs were not included.
+
+---
+
+## Entry 11 — 2026-11-15 20:55 IST — Commit the candidate's reviews; record the prompts
+
+**Instruction:** `prompts/03-commit-candidate-reviews.md`: commit and push the candidate's new `prompts/README.md`
+and the review lines added to this journal. Then `prompts/04-record-prompts-and-confirm.md`: save that prompt as a
+numbered file, update the other files that need it, and confirm with the candidate before committing.
+
+**Produced:** commit `13a0a69` with the two candidate-written files, unchanged, pushed to `main`. Then the two prompt
+files, this entry, and the walkthrough's R8 and R9 rows brought up to date (they still listed only prompts 00 and 01,
+and described every review line as empty).
+
+**Alternatives considered:**
+- *Save prompt 03 in the same commit as the candidate's files.* Not done, because the instruction named exactly two
+  files; the omission was reported instead, which led to prompt 04.
+- *Leave this entry's review line out, since the candidate has already reviewed the build.* Kept it, blank, like
+  every other entry.
+
+**Corrections to my own output:**
+1. Prompt 03 was not saved when it was given, although the master prompt asks for every later prompt to be saved.
+   Saved now, with a note that it was saved late.
+2. Entry 10 was appended with a second horizontal rule above it, leaving two in a row; removed one.
+3. The journal's header named only `claude-fable-5-2`, the first session's model, although entries 07 onwards were
+   written by Claude Opus 5.5. The candidate asked for the header to be corrected; it now names both models and
+   which entries each wrote, taken from the commits' `Co-Authored-By` lines.
+
+**Candidate review:**
+I agree to that.

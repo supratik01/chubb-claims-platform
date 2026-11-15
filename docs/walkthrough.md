@@ -186,8 +186,8 @@ overridable through environment variables. No commit message is a bare "update" 
 | R5 | OpenAPI YAML contract, optionally a Postman collection | Met | `claims-api.yaml`; `postman/claims-api.postman_collection.json` |
 | R6 | `docker-compose.yml` running the whole stack with one command | Met | PostgreSQL 18, Kafka, backend and frontend; `docker compose up --build` |
 | R7 | `NOTES.md` with decisions and assumptions | Met | 24 decisions, 11 assumptions, 6 recorded conflicts |
-| R8 | `prompts/` with every prompt used | Met | `00-master-prompt.md`, `01-resume-session.md` |
-| R9 | `.claude/ai-journal.md` | Met | Entries 01 to 09, each with an empty line for the candidate's review |
+| R8 | `prompts/` with every prompt used | Met | `00-master-prompt.md` to `04-record-prompts-and-confirm.md`, and the candidate's `README.md` on how the master prompt was built |
+| R9 | `.claude/ai-journal.md` | Met | Entries 01 to 11; the candidate's review is filled in on 01 to 10, and 11 is awaiting it |
 | R10 | Short architecture diagram | Met | Mermaid diagrams in `docs/architecture.md` |
 | R11 | `.gitignore`; no secrets committed | Met | See repository hygiene above |
 | R12 | Commit messages that describe intent | Met | Every commit states what changed and why, in build order |
