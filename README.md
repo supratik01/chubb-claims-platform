@@ -134,8 +134,8 @@ postman collection run postman/claims-api.postman_collection.json
 |---|---|---|---|
 | Backend unit tests | 58 | Status transitions, the claim aggregate's rules (amounts, dates, history, events), each service's access and business rules, the exposure projection's idempotency, and an ArchUnit test that enforces the layering | Java 21 |
 | Backend integration tests | 20 | The main endpoints over HTTP on real PostgreSQL and Kafka (Testcontainers), every response validated against the OpenAPI file; authentication and role rules; the event flow from outbox to Kafka to the exposure summary, including redelivery and the dead-letter topic | Docker |
-| Frontend unit and component tests | 80 | Session store, interceptor and guards; request-state helpers; shared components; the sign-in, report-incident, my-claims, claim, work-queue and exposure screens; the staff action rules and decision form | Node 24 |
-| End-to-end tests | 7 | The full lifecycle with three people signed in at once (report, pick up, question, answer, approve, decision seen, payment, exposure moving at each step); rejection with a reason; access by role; sign-in errors and return to the requested page | The running stack, Node 24 |
+| Frontend unit and component tests | 83 | Session store, interceptor and guards; request-state helpers; shared components; focus management in the shell; the sign-in, report-incident, my-claims, claim, work-queue and exposure screens; the staff action rules and decision form | Node 24 |
+| End-to-end tests | 14 | The full lifecycle with three people signed in at once (report, pick up, question, answer, approve, decision seen, payment, exposure moving at each step); rejection with a reason; access by role; sign-in errors and return to the requested page; axe-core WCAG 2.1 AA scans of every main screen in light and dark mode; keyboard use of the work queue | The running stack, Node 24 |
 | Postman collection | 22 requests, 43 assertions | The demo flow and the error responses, through the public API | The running stack, Postman CLI |
 
 Run them from the repository root:
