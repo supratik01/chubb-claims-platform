@@ -204,3 +204,50 @@ a fresh clone.
 **Candidate review:**
 
 ---
+
+## Entry 08 — 2026-11-15 15:10 IST — Frontend: workspace, shell, micro-frontends, Docker
+
+**Instruction:** Step 3, frontend: the shell, the claimant and staff micro-frontends and a shared library; typed
+against the contract; predictable state; theme, loading, empty and error states; accessibility basics. Then
+`docker compose up` for the whole stack.
+
+**Produced:** An Angular 22 workspace with three applications and one library, Native Federation 22, Dockerfiles
+for both tiers, nginx configuration and `docker-compose.yml`. The first `docker compose up --build` (including base
+image pulls) reached all-healthy in 115 seconds, and signing in as the demo claimant in a browser loaded the claimant
+micro-frontend at runtime through the relative federation manifest.
+
+**Alternatives considered:**
+- *Forcing openapi-typescript into the workspace* with `--legacy-peer-deps`. It declares TypeScript 5 as a peer and
+  Angular 22 needs TypeScript 6. Ran it through `npx` instead, since the generated file is committed (D11) and the
+  build never needs the generator.
+- *Node 22.18 (installed) with Angular 21* versus *installing Node 24 LTS with nvm for Angular 22*. Angular CLI 22.2
+  needs Node 22.22 or later. Installed Node 24 alongside, left the machine's default alone, and pinned it in
+  `frontend/.nvmrc`; NOTES D13 already named Angular 22, and the Docker build uses Node 24 anyway.
+- *Absolute remote URLs injected at container start* versus *relative paths in the deployed manifest*. Read the
+  runtime's URL handling, then tested relative paths in a browser rather than reasoning further; they work, so no
+  start-up script is needed.
+- *Publishing PostgreSQL and Kafka ports* for local tooling. Rejected: a reviewer with a local PostgreSQL on 5432
+  would see `docker compose up` fail. Only ports 4200 and 8080 are published, both overridable.
+- *Generic store base class* versus *two small helpers*. Chose `QueryState` (a read) and `CommandState` (a write)
+  that every store composes; a base class would hide what each store does.
+
+**Corrections to my own output (each caught before or by a test, not by the reviewer):**
+1. The decision form re-suggested the approved amount whenever the claim object changed. The page refreshes the
+   claim every ten seconds, so an officer's typed amount would have been overwritten mid-edit. Changed the effect to
+   depend on the claim's id only; my first patch still read the claim tracked, and I caught that on re-reading.
+2. Pages call `store.open()` from an effect, and `QueryState.load()` read its own state signal, which would have made
+   every load trigger another load. Made loads and commands untracked inside the helpers, so any store is safe to
+   call from an effect, and made the page effects say so explicitly.
+3. The claimant's answer form used `(ngSubmit)` on a bare `<form>`. Without a form directive that event never fires,
+   and the button would have done a native submit and reloaded the page. The component test failed on it; fixed the
+   component, not the test.
+4. A scripted find-and-replace that introduced the money pipe mangled two import statements. The build caught it;
+   fixed by hand and then ran Prettier over the workspace.
+5. The contrast ratios I wrote into the theme comments were estimates. Computed them; all pairs pass WCAG AA (lowest
+   5.4:1) but several comments were off by a few tenths and were corrected.
+6. The unit-test builder was pointed at the federation builder and warned about it; pointed it at each
+   application's esbuild target.
+
+**Candidate review:**
+
+---
