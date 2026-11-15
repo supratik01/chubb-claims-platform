@@ -164,6 +164,51 @@ accepted. Assumptions and conflicts between the input documents are listed at th
 - **Alternatives:** Persistent volumes.
 - **Trade-off:** Data is lost on `down`. That is the desired behaviour for a demo and wrong for anything else.
 
+### D20. Session token kept in sessionStorage
+- **Context:** The browser must hold the JWT from D9 between requests and survive a page reload.
+- **Decision:** The shared `SessionStore` keeps the token and user in a signal and mirrors them to `sessionStorage`,
+  which is cleared when the tab closes. Expired tokens are dropped on read, and a 401 from the API signs the user out.
+- **Alternatives:** Memory only (lost on every reload); `localStorage` (survives closing the browser); an httpOnly
+  cookie set by the backend.
+- **Trade-off:** Script can read the token, so a cross-site scripting flaw could steal it. Angular escapes all
+  bound values and the app renders no raw HTML, which limits that risk. An httpOnly cookie would remove it but needs
+  CSRF protection and a backend change; it is the first hardening step listed in the walkthrough.
+
+### D21. Angular 22 on Node 24 LTS; API types generated through npx
+- **Context:** Angular CLI 22.2 needs Node 22.22 or later, and openapi-typescript 7.13 declares TypeScript 5 as a
+  peer while Angular 22 uses TypeScript 6.
+- **Decision:** Node 24 LTS for the frontend (`frontend/.nvmrc`, and the Docker build image). The type generator runs
+  through `npx` in its own environment; its output is committed (D11).
+- **Alternatives:** Angular 21 on the installed Node 22.18; installing the generator with `--legacy-peer-deps`.
+- **Trade-off:** A developer needs Node 24 to work on the frontend outside Docker. Forcing peer dependencies would
+  hide a real incompatibility in the lock file.
+
+### D22. Only the web app and the API are published to the host
+- **Context:** The stack must start on an unknown machine (R15), which may already run PostgreSQL or Kafka.
+- **Decision:** `docker-compose.yml` publishes port 4200 (web, which also proxies `/api`) and 8080 (API, for Postman
+  and the Angular dev server), both overridable. PostgreSQL and Kafka are reachable only inside the Compose network.
+- **Alternatives:** Publish every service on its usual port.
+- **Trade-off:** Database and broker tools on the host cannot connect without editing the file. The integration
+  tests do not need them: they start their own containers.
+
+### D23. End-to-end tests run against the real stack, one at a time
+- **Context:** The prompt asks for one end-to-end test per key flow.
+- **Decision:** Playwright drives the stack started by `docker compose up`, with no mocked API, and runs tests
+  serially. Selectors use roles and labels.
+- **Alternatives:** End-to-end tests against a mocked backend; running in parallel.
+- **Trade-off:** Slower (about 40 seconds) and dependent on Docker, but the lifecycle test is the only test that
+  proves the whole path from a click to a Kafka-built figure on another user's screen. Serial runs keep the exposure
+  assertions exact, because each test measures a change in a shared total.
+
+### D24. One `QueryState` and one `CommandState` per store instead of a store library
+- **Context:** D15 chose signal stores. Six stores repeat the same read and write patterns.
+- **Decision:** Two small helpers in the shared library: `QueryState` (loading, loaded, error; background refresh
+  keeps current data) and `CommandState` (pending, error; ignores a second submit). Each store composes them and
+  is provided by its page, so its lifetime is the page's. Both run untracked, so a store can be called from an effect.
+- **Alternatives:** A generic base store class; NgRx SignalStore.
+- **Trade-off:** Two in-house helpers to maintain. They are about 100 lines with their own tests, and every store
+  still reads as plain code.
+
 ## Assumptions
 
 1. **Markets.** The brief says six countries without naming them. Assumed Singapore, Hong Kong, Australia, Malaysia,
@@ -178,8 +223,13 @@ accepted. Assumptions and conflicts between the input documents are listed at th
 6. **"Performance" in the workload view** means closed-claim counts per officer. Time-to-decision metrics are a next step.
 7. **Answering an information request is text only**, because uploads are deferred.
 8. **Settlement records that payment happened.** No payment system is called.
-9. **Time box.** The build was done by an AI agent in one autonomous session; the three-to-five-hour limit in R17
-   cannot be evidenced from the repository beyond commit timestamps.
+9. **Time box.** The build was done by an AI agent in two autonomous sessions on 15 November 2026 (the second
+   resumed the first; see `prompts/01-resume-session.md`). The three-to-five-hour limit in R17 cannot be evidenced
+   from the repository beyond commit timestamps.
+10. **The demo password is shown on the sign-in page.** It helps a reviewer try each role. It is the documented,
+    overridable default for throwaway seeded users and would not exist in a real deployment.
+11. **Background refresh every ten seconds is fresh enough.** A claimant or officer sees another person's action
+    within ten seconds without reloading (D16).
 
 ## Conflicts between the inputs
 
