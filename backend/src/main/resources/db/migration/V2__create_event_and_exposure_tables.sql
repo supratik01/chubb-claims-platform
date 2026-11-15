@@ -23,9 +23,9 @@ CREATE TABLE processed_event (
 
 -- Read model: open claims and outstanding amount per market, line of business and currency.
 CREATE TABLE exposure_summary (
-    country_code       CHAR(2)        NOT NULL,
+    country_code       VARCHAR(2)     NOT NULL,
     line_of_business   VARCHAR(20)    NOT NULL,
-    currency           CHAR(3)        NOT NULL,
+    currency           VARCHAR(3)     NOT NULL,
     open_claim_count   BIGINT         NOT NULL,
     outstanding_amount NUMERIC(16, 2) NOT NULL,
     updated_at         TIMESTAMPTZ    NOT NULL,
