@@ -90,8 +90,8 @@ paths:
       summary: List claims
       description: |
         Claimants always receive only their own claims; `assignment` is ignored for them.
-        Staff receive claims filtered by `assignment` and `status`. Results are ordered oldest first, so the
-        claim that has waited longest is at the top of a work queue.
+        Staff receive claims filtered by `assignment` and `status`, oldest first, so the claim that has
+        waited longest is at the top of a work queue. Claimants receive their claims newest first.
       parameters:
         - name: assignment
           in: query
@@ -454,8 +454,10 @@ components:
       required: [toStatus, changedByName, changedAt]
       properties:
         fromStatus:
-          allOf: [{ $ref: '#/components/schemas/ClaimStatus' }]
+          type: string
           nullable: true
+          enum: [SUBMITTED, UNDER_REVIEW, INFO_REQUESTED, APPROVED, REJECTED, SETTLED, null]
+          description: The status before the change; null for the entry that records the submission.
         toStatus: { $ref: '#/components/schemas/ClaimStatus' }
         changedByName: { type: string }
         note: { type: string, nullable: true }
@@ -530,7 +532,7 @@ components:
         officerName: { type: string }
         underReview: { type: integer, format: int64, description: Waiting on the officer. }
         awaitingInformation: { type: integer, format: int64, description: Waiting on the claimant. }
-        awaitingSettlement: { type: integer, format: int64, description: Approved, payment not yet recorded. }
+        awaitingSettlement: { type: integer, format: int64, description: "Approved, payment not yet recorded." }
         closed: { type: integer, format: int64, description: Rejected or settled. }
 
     ExposureSummary:
