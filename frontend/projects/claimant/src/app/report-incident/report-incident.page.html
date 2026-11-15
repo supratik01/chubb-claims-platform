@@ -1,0 +1,136 @@
+<section class="cc-page">
+  <header class="cc-page-header">
+    <h1>Report an incident</h1>
+    <a routerLink="..">Back to my claims</a>
+  </header>
+
+  <cc-page-state
+    [state]="store.policiesState()"
+    [empty]="store.policies().length === 0"
+    emptyMessage="You have no active policies to claim against. Please contact us."
+    loadingMessage="Loading your policies…"
+    (retry)="store.reloadPolicies()"
+  >
+    <form class="cc-card" [formGroup]="form" (ngSubmit)="submit()" novalidate aria-describedby="form-intro">
+      <p id="form-intro" class="cc-muted">
+        Tell us what happened. A claims officer will review your claim and may ask you for more information.
+        All fields are required unless marked optional.
+      </p>
+
+      <cc-error-alert [error]="store.submitError()" />
+
+      <div class="cc-field">
+        <label for="policyId">Policy</label>
+        <select
+          id="policyId"
+          formControlName="policyId"
+          [attr.aria-invalid]="invalid('policyId') ? 'true' : null"
+          [attr.aria-describedby]="describedBy('policyId')"
+        >
+          <option value="" disabled>Choose a policy</option>
+          @for (policy of store.policies(); track policy.id) {
+            <option [value]="policy.id">
+              {{ policy.policyNumber }} · {{ lineLabels[policy.lineOfBusiness] }} · {{ policy.countryCode }}
+            </option>
+          }
+        </select>
+        @if (invalid('policyId')) {
+          <span id="policyId-error" class="cc-field__error">Choose the policy this incident is covered by.</span>
+        }
+      </div>
+
+      <div class="cc-field">
+        <label for="incidentDate">Date of the incident</label>
+        <input
+          id="incidentDate"
+          type="date"
+          formControlName="incidentDate"
+          [max]="maxIncidentDate"
+          [attr.aria-invalid]="invalid('incidentDate') ? 'true' : null"
+          [attr.aria-describedby]="describedBy('incidentDate', selectedPolicy() ? 'incidentDate-hint' : undefined)"
+        />
+        @if (selectedPolicy(); as policy) {
+          <span id="incidentDate-hint" class="cc-field__hint">
+            Your cover runs from {{ policy.coverStart | date: 'mediumDate' }} to
+            {{ policy.coverEnd | date: 'mediumDate' }}.
+          </span>
+        }
+        @if (hasError('incidentDate', 'required')) {
+          <span id="incidentDate-error" class="cc-field__error">Enter the date of the incident.</span>
+        } @else if (hasError('incidentDate', 'future')) {
+          <span id="incidentDate-error" class="cc-field__error">The incident date cannot be in the future.</span>
+        } @else if (hasError('incidentDate', 'outsideCover')) {
+          <span id="incidentDate-error" class="cc-field__error">
+            The incident date must fall within your policy's cover period.
+          </span>
+        }
+      </div>
+
+      <div class="cc-field">
+        <label for="incidentLocation">Where it happened (optional)</label>
+        <input
+          id="incidentLocation"
+          type="text"
+          formControlName="incidentLocation"
+          maxlength="200"
+          [attr.aria-invalid]="invalid('incidentLocation') ? 'true' : null"
+          [attr.aria-describedby]="describedBy('incidentLocation')"
+        />
+        @if (invalid('incidentLocation')) {
+          <span id="incidentLocation-error" class="cc-field__error">Use at most 200 characters.</span>
+        }
+      </div>
+
+      <div class="cc-field">
+        <label for="description">What happened</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          maxlength="2000"
+          [attr.aria-invalid]="invalid('description') ? 'true' : null"
+          [attr.aria-describedby]="describedBy('description', 'description-hint')"
+        ></textarea>
+        <span id="description-hint" class="cc-field__hint">At least 10 characters. Include any damage and who was involved.</span>
+        @if (hasError('description', 'required')) {
+          <span id="description-error" class="cc-field__error">Describe what happened.</span>
+        } @else if (hasError('description', 'minlength')) {
+          <span id="description-error" class="cc-field__error">Please give a little more detail (at least 10 characters).</span>
+        }
+      </div>
+
+      <div class="cc-field">
+        <label for="claimedAmount">
+          Amount you are claiming
+          @if (selectedPolicy(); as policy) {
+            ({{ policy.currency }})
+          }
+        </label>
+        <input
+          id="claimedAmount"
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          step="0.01"
+          formControlName="claimedAmount"
+          [attr.aria-invalid]="invalid('claimedAmount') ? 'true' : null"
+          [attr.aria-describedby]="describedBy('claimedAmount', selectedPolicy() ? 'claimedAmount-hint' : undefined)"
+        />
+        @if (selectedPolicy(); as policy) {
+          <span id="claimedAmount-hint" class="cc-field__hint">
+            Your sum insured is {{ policy.sumInsured | currency: policy.currency : 'code' }}.
+          </span>
+        }
+        @if (invalid('claimedAmount')) {
+          <span id="claimedAmount-error" class="cc-field__error">Enter an amount greater than zero.</span>
+        }
+      </div>
+
+      <div class="cc-actions">
+        <button type="submit" class="cc-button" [disabled]="store.submitting()">
+          {{ store.submitting() ? 'Submitting…' : 'Submit claim' }}
+        </button>
+        <a class="cc-button cc-button--secondary" routerLink="..">Cancel</a>
+      </div>
+    </form>
+  </cc-page-state>
+</section>

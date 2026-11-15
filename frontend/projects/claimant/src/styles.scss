@@ -1,1 +1,2 @@
-/* You can add global styles to this file, and also import other style files */
+// Used only when this micro-frontend runs on its own for development. Inside the shell, the shell's theme applies.
+@use '../../shared/src/lib/styles/theme';

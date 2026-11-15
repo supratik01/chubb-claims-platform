@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+/** Root component for running this micro-frontend on its own during development. */
 @Component({
-  imports: [RouterOutlet],
   selector: 'claimant-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet],
+  template: `<main><router-outlet /></main>`,
 })
-export class App {
-  protected readonly title = signal('claimant');
-}
+export class App {}

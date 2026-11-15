@@ -1,0 +1,54 @@
+<section class="cc-page">
+  <header class="cc-page-header">
+    <h1>My claims</h1>
+    <a class="cc-button" routerLink="report">Report an incident</a>
+  </header>
+
+  @if (store.awaitingMe() > 0) {
+    <p class="action-banner" role="status">
+      {{ store.awaitingMe() === 1 ? 'One claim needs' : store.awaitingMe() + ' claims need' }} an answer from you.
+    </p>
+  }
+
+  <cc-page-state
+    [state]="store.state()"
+    [empty]="store.claims().length === 0"
+    emptyMessage="You have not reported any incidents yet."
+    loadingMessage="Loading your claims…"
+    (retry)="store.reload()"
+  >
+    <a ccEmptyAction class="cc-button" routerLink="report">Report your first incident</a>
+
+    <ul class="claims" aria-label="Your claims">
+      @for (claim of store.claims(); track claim.id) {
+        <li class="cc-card claim">
+          <div class="claim__head">
+            <a class="claim__number" [routerLink]="['claims', claim.id]">{{ claim.claimNumber }}</a>
+            <cc-status-badge [status]="claim.status" />
+            @if (isAwaitingClaimant(claim.status)) {
+              <span class="claim__action">Action required</span>
+            }
+          </div>
+          <dl class="claim__facts">
+            <div>
+              <dt>Cover</dt>
+              <dd>{{ lineLabels[claim.lineOfBusiness] }} · {{ claim.policyNumber }}</dd>
+            </div>
+            <div>
+              <dt>Incident date</dt>
+              <dd>{{ claim.incidentDate | date: 'mediumDate' }}</dd>
+            </div>
+            <div>
+              <dt>Amount claimed</dt>
+              <dd>{{ claim.claimedAmount | currency: claim.currency : 'code' }}</dd>
+            </div>
+            <div>
+              <dt>Last update</dt>
+              <dd>{{ claim.updatedAt | date: 'medium' }}</dd>
+            </div>
+          </dl>
+        </li>
+      }
+    </ul>
+  </cc-page-state>
+</section>

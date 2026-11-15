@@ -1,0 +1,33 @@
+.claim-header {
+  margin-top: var(--cc-space-4);
+  justify-content: flex-start;
+}
+
+.next-step {
+  background: var(--cc-tone-info-bg);
+  color: var(--cc-tone-info-fg);
+  border-left: 4px solid currentColor;
+  border-radius: var(--cc-radius);
+  padding: var(--cc-space-3) var(--cc-space-4);
+  font-weight: 600;
+  margin: 0 0 var(--cc-space-6);
+}
+
+.next-step--action {
+  background: var(--cc-tone-warning-bg);
+  color: var(--cc-tone-warning-fg);
+}
+
+.decision--approved {
+  border-left: 6px solid var(--cc-tone-success-fg);
+}
+
+.decision--rejected {
+  border-left: 6px solid var(--cc-tone-danger-fg);
+}
+
+.decision__amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--cc-space-2);
+}

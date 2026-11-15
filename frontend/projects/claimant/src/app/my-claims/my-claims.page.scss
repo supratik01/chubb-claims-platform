@@ -1,0 +1,52 @@
+.action-banner {
+  color: var(--cc-tone-warning-fg);
+  background: var(--cc-tone-warning-bg);
+  border-left: 4px solid currentColor;
+  border-radius: var(--cc-radius);
+  padding: var(--cc-space-3) var(--cc-space-4);
+  font-weight: 600;
+}
+
+.claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.claim {
+  margin-bottom: var(--cc-space-4);
+}
+
+.claim__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cc-space-3);
+  margin-bottom: var(--cc-space-3);
+}
+
+.claim__number {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.claim__action {
+  color: var(--cc-tone-warning-fg);
+  font-weight: 700;
+}
+
+.claim__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--cc-space-3);
+  margin: 0;
+
+  dt {
+    color: var(--cc-color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  dd {
+    margin: 0;
+  }
+}

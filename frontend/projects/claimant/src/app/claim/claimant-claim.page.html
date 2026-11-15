@@ -1,0 +1,54 @@
+<section class="cc-page">
+  <a routerLink="../..">Back to my claims</a>
+
+  <cc-page-state [state]="store.state()" loadingMessage="Loading your claim…" (retry)="store.reload()">
+    @if (store.claim(); as claim) {
+      <header class="cc-page-header claim-header">
+        <h1>Claim {{ claim.claimNumber }}</h1>
+        <cc-status-badge [status]="claim.status" />
+      </header>
+
+      <p class="next-step" [class.next-step--action]="claim.status === 'INFO_REQUESTED'" role="status">
+        {{ nextStep() }}
+      </p>
+
+      @if (claim.status === 'APPROVED' || claim.status === 'SETTLED') {
+        <section class="cc-card decision decision--approved" aria-labelledby="decision-heading">
+          <h2 id="decision-heading">Decision: approved</h2>
+          <p class="decision__amount">{{ claim.approvedAmount | currency: claim.currency : 'code' }}</p>
+          @if (claim.decisionReason) {
+            <p>{{ claim.decisionReason }}</p>
+          }
+        </section>
+      } @else if (claim.status === 'REJECTED') {
+        <section class="cc-card decision decision--rejected" aria-labelledby="decision-heading">
+          <h2 id="decision-heading">Decision: not approved</h2>
+          <p>{{ claim.decisionReason }}</p>
+        </section>
+      }
+
+      <div class="cc-grid">
+        <section class="cc-card" aria-labelledby="questions-heading">
+          <h2 id="questions-heading">Questions from your claims officer</h2>
+          <cc-error-alert [error]="store.answerError()" />
+          <cc-information-requests
+            [requests]="claim.informationRequests"
+            [canRespond]="claim.status === 'INFO_REQUESTED'"
+            [busy]="store.answerPending()"
+            (respond)="answer($event)"
+          />
+        </section>
+
+        <section class="cc-card" aria-labelledby="history-heading">
+          <h2 id="history-heading">Progress</h2>
+          <cc-status-timeline [entries]="claim.statusHistory" />
+        </section>
+      </div>
+
+      <section class="cc-card" aria-labelledby="details-heading">
+        <h2 id="details-heading">Claim details</h2>
+        <cc-claim-facts [claim]="claim" />
+      </section>
+    }
+  </cc-page-state>
+</section>
