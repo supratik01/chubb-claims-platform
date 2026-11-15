@@ -1,0 +1,32 @@
+.login {
+  display: grid;
+  gap: var(--cc-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  align-items: start;
+}
+
+.login__submit {
+  width: 100%;
+}
+
+.login__notice {
+  color: var(--cc-tone-info-fg);
+  background: var(--cc-tone-info-bg);
+  border-radius: var(--cc-radius);
+  padding: var(--cc-space-3) var(--cc-space-4);
+}
+
+.login__demo ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cc-space-3);
+}
+
+.login__demo li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cc-space-3);
+}

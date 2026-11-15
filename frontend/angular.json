@@ -61,8 +61,12 @@
                 "input": "projects/shell/public"
               }
             ],
-            "styles": ["projects/shell/src/styles.scss"],
-            "polyfills": ["es-module-shims"]
+            "styles": [
+              "projects/shell/src/styles.scss"
+            ],
+            "polyfills": [
+              "es-module-shims"
+            ]
           },
           "configurations": {
             "production": {
@@ -100,7 +104,8 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 4200
+            "port": 4200,
+            "proxyConfig": "projects/shell/proxy.conf.json"
           }
         }
       }
@@ -160,8 +165,12 @@
                 "input": "projects/claimant/public"
               }
             ],
-            "styles": ["projects/claimant/src/styles.scss"],
-            "polyfills": ["es-module-shims"]
+            "styles": [
+              "projects/claimant/src/styles.scss"
+            ],
+            "polyfills": [
+              "es-module-shims"
+            ]
           },
           "configurations": {
             "production": {
@@ -259,8 +268,12 @@
                 "input": "projects/staff/public"
               }
             ],
-            "styles": ["projects/staff/src/styles.scss"],
-            "polyfills": ["es-module-shims"]
+            "styles": [
+              "projects/staff/src/styles.scss"
+            ],
+            "polyfills": [
+              "es-module-shims"
+            ]
           },
           "configurations": {
             "production": {

@@ -1,0 +1,65 @@
+<section class="cc-page login">
+  <div class="cc-card login__card">
+    <h1>Sign in</h1>
+    <p class="cc-muted">Report and track claims, or manage the claims queue.</p>
+
+    @if (reason() === 'expired') {
+      <p class="login__notice" role="status">Your session ended. Please sign in again.</p>
+    }
+
+    <cc-error-alert [error]="error()" />
+
+    <form [formGroup]="form" (ngSubmit)="signIn()" novalidate>
+      <div class="cc-field">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          autocomplete="username"
+          [attr.aria-invalid]="invalid('username') ? 'true' : null"
+          [attr.aria-describedby]="invalid('username') ? 'username-error' : null"
+        />
+        @if (invalid('username')) {
+          <span id="username-error" class="cc-field__error">Enter your username.</span>
+        }
+      </div>
+
+      <div class="cc-field">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          [attr.aria-invalid]="invalid('password') ? 'true' : null"
+          [attr.aria-describedby]="invalid('password') ? 'password-error' : null"
+        />
+        @if (invalid('password')) {
+          <span id="password-error" class="cc-field__error">Enter your password.</span>
+        }
+      </div>
+
+      <button type="submit" class="cc-button login__submit" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+  </div>
+
+  <aside class="cc-card login__demo" aria-labelledby="demo-heading">
+    <h2 id="demo-heading">Demo accounts</h2>
+    <p class="cc-muted">
+      Every demo account uses the password from the README (by default <code>Demo-Passw0rd!</code>).
+    </p>
+    <ul>
+      @for (account of demoAccounts; track account.username) {
+        <li>
+          <button type="button" class="cc-button cc-button--secondary" (click)="useAccount(account.username)">
+            Use {{ account.username }}
+          </button>
+          <span class="cc-muted">{{ account.description }}</span>
+        </li>
+      }
+    </ul>
+  </aside>
+</section>
