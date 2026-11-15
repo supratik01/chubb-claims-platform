@@ -35,6 +35,7 @@ and also walks grouped shapes, so it was used.
 package and failed. Re-ran without isolation.
 
 **Candidate review:**
+I agree with treating the shell as the single user-facing app while using micro-frontends internally. The JWT approach is also more credible than a freely selectable role header.
 
 ---
 
@@ -55,6 +56,7 @@ first commit, save the prompt, start this journal.
 **Corrections:** None.
 
 **Candidate review:**
+The repository setup is appropriate and transparent. Keeping safe defaults while excluding secrets and generated files makes the project easy to run and review.
 
 ---
 
@@ -87,6 +89,7 @@ contract has 11 operations and one error schema.
   real history and events.
 
 **Candidate review:**
+I agree with the outbox, exposure projection and reserve_amount decisions. The documented assumptions and conflicts make the design process clear.
 
 ---
 
@@ -115,6 +118,7 @@ workflow.
   UTC day and would have been refused. Changed to the latest calendar date anywhere and added a test for it.
 
 **Candidate review:**
+The domain-first approach and aggregate-controlled status transitions are sound. The corrections to amount tracking and timezone handling improved the workflow’s reliability.
 
 ---
 
@@ -145,6 +149,7 @@ seeder) and `api/` (five controllers, DTO records, one exception handler).
 - A leftover unused helper (`DashboardService.zero()`) was removed before the first compile.
 
 **Candidate review:**
+The layering and immutable view records keep persistence concerns out of the API. Centralizing endpoint permissions while enforcing ownership in services is a sensible balance.
 
 ---
 
@@ -179,6 +184,7 @@ PostgreSQL is needed anyway for the native upsert and `SKIP LOCKED` queries, and
 reviewed only. Listed under next steps.
 
 **Candidate review:**
+The combination of unit tests and real PostgreSQL/Kafka integration tests provides good coverage. The remaining optimistic-lock test is a known, clearly documented gap.
 
 ---
 
@@ -202,6 +208,7 @@ Dockerfiles and `docker-compose.yml`; the Postman collection; `README.md` and `d
 a fresh clone.
 
 **Candidate review:**
+Resuming from the existing repository was the right choice and preserved the development history. The test-count discrepancy was responsibly checked and corrected.
 
 ---
 
@@ -249,6 +256,7 @@ micro-frontend at runtime through the relative federation manifest.
    application's esbuild target.
 
 **Candidate review:**
+The Angular, Native Federation and Docker setup meets the architectural goals. The fixes around forms, reactive loading, refresh behavior and keyboard focus addressed important usability issues.
 
 ---
 
@@ -293,6 +301,7 @@ and processed-event ids are never purged; the lists have no paging controls beyo
 micro-frontend load needs a full page reload to retry.
 
 **Candidate review:**
+The final verification is convincing because it combines automated tests, end-to-end flows, accessibility checks and contract validation. The remaining production-hardening items are clearly documented.
 
 ---
 
@@ -319,3 +328,4 @@ output or dependencies are tracked; the only credentials in the repository are t
 **Corrections to my own output:** none.
 
 **Candidate review:**
+Publishing the clean repository with its full commit history was appropriate for the assessment. The checks confirmed that secrets, generated files and unrelated inputs were not included.
