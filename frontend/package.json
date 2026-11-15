@@ -29,6 +29,7 @@
     "@angular/build": "^22.2.7",
     "@angular/cli": "^22.2.7",
     "@angular/compiler-cli": "^22.2.0",
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.1",
     "@softarc/native-federation-orchestrator": "^4.10.0",
     "jsdom": "^30.0.0",
