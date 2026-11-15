@@ -63,8 +63,7 @@ first commit, save the prompt, start this journal.
 **Instruction:** Step 2: write `docs/requirements.md`, `docs/architecture.md`, `NOTES.md` and the OpenAPI contract
 before any feature code.
 
-**Produced:** The four files. 43 requirements traced to their source (31 must-have, 8 deferred with reasons, 4
-delivery items that are simply followed). 19 decisions, 9 assumptions and 6 recorded conflicts in `NOTES.md`. The
+**Produced:** The four files. 51 requirements traced to their source (43 must-have, 8 deferred with reasons). 19 decisions, 9 assumptions and 6 recorded conflicts in `NOTES.md`. The
 contract has 11 operations and one error schema.
 
 **Alternatives considered (full reasoning in `NOTES.md`):**
@@ -86,6 +85,98 @@ contract has 11 operations and one error schema.
   after approval the liability is the approved amount, not what was asked for.
 - I had seed data as SQL migrations; changed to a seeder that calls the real services (D18) so seeded claims have
   real history and events.
+
+**Candidate review:**
+
+---
+
+## Entry 04 — 2026-11-15 14:35 IST — Backend: domain model and workflow
+
+**Instruction:** Step 3, backend first: strict layering, the claim status workflow, versioned migrations.
+
+**Produced:** `domain/` (Claim aggregate, ClaimStatus transition table, status history, information requests,
+ClaimStatusChanged event, repository ports, exceptions), Flyway migrations V1 and V2, and 30 unit tests for the
+workflow.
+
+**Alternatives considered:**
+- *Spring Boot 3.5 versus 4.1.* I know 3.5 best, but its open-source support ended in mid-2026 and 4.1.2 is current.
+  Starting a new service on an unsupported line is hard to defend, so I used 4.1.2 and took the starter names from a
+  Spring Initializr skeleton (generated with placeholder names) rather than from memory.
+- *Status as a field services can set* versus methods on the aggregate. Chose methods (`pickUp`, `approve`, ...), with
+  no public setter, so an illegal transition cannot be written by accident.
+- *Returning events from each method* versus the aggregate collecting them (`pullEvents`). Chose collecting, so every
+  method has the same shape and the factory method can raise an event too.
+
+**Corrections to my own output:**
+- `approve` first changed the reserve and then captured the "previous outstanding" figure, which would have made the
+  event report no change. Reordered so the previous figure is captured before any field changes; a unit test now pins
+  the 4,200 to 3,800 case.
+- I had "today" as the UTC date for the future-incident check. A claimant in Sydney at 08:00 is still on the previous
+  UTC day and would have been refused. Changed to the latest calendar date anywhere and added a test for it.
+
+**Candidate review:**
+
+---
+
+## Entry 05 — 2026-11-15 15:10 IST — Backend: services, persistence, security, API, events
+
+**Instruction:** Step 3: endpoints per the contract, validation, one error format, Kafka producer and consumer, seed
+data, role-based access.
+
+**Produced:** `service/` (five use-case services, an access policy, immutable view records), `infrastructure/`
+(Spring Data adapters, transactional outbox and relay, Kafka listener with dead-letter handling, JWT security, demo
+seeder) and `api/` (five controllers, DTO records, one exception handler).
+
+**Alternatives considered:**
+- *Returning JPA entities from services* versus view records. Entities would be read by controllers after the
+  transaction closed (lazy-loading failures) or need open-session-in-view. Chose view records built inside the
+  transaction, at the cost of one more mapping step.
+- *Separate adapter classes for each repository port* versus a Spring Data interface that extends the port. Chose the
+  latter: no hand-written adapter code, and the service layer still sees only the port.
+- *`@PreAuthorize` on each controller method* versus one table of URL rules. Chose the table in `SecurityConfig` so
+  the whole role matrix is reviewable in one screen; ownership and assignment rules stay in the service layer because
+  they need the claim.
+- *Rejecting a missing approved amount as a 400* versus a 422. Left it as a business rule (422) in the aggregate, so
+  the rule lives in one place.
+
+**Corrections to my own output:**
+- The services were written in one pass and compiled, so the history commits them in dependency order rather than in
+  the order typed. The commit order is honest about structure, not about minute-by-minute sequence.
+- A leftover unused helper (`DashboardService.zero()`) was removed before the first compile.
+
+**Candidate review:**
+
+---
+
+## Entry 06 — 2026-11-15 15:40 IST — Backend tests, and what they caught
+
+**Instruction:** Step 3 tests: unit tests for workflow and service rules, integration tests for the main endpoints
+and the Kafka event flow.
+
+**Produced:** 78 tests, all passing (`mvn test`, 17 seconds with warm containers): 58 unit tests including an
+ArchUnit layering test, and 20 integration tests on real PostgreSQL 18 and Kafka 4.2 through Testcontainers. Every
+integration request is validated against `claims-api.yaml`.
+
+**What the tests caught in my own work (each fixed at the cause):**
+1. *Schema mismatch.* Hibernate's schema validation refused to start: the migrations used `CHAR(2)`/`CHAR(3)` and the
+   entities map to `VARCHAR`. Changed the migrations (they had never been released) rather than loosening validation.
+2. *Invalid YAML in the contract.* A description containing a comma inside an inline map was parsed as an extra key.
+   Quoted it. The contract validator found this; nothing else would have until the frontend types were generated.
+3. *Contract and code disagreed on a nullable enum.* `fromStatus` is null on the first history entry, but the contract
+   declared it through a reference that did not allow null. Fixed the contract.
+4. *Validator and `allOf`.* The validator rejects fields of one `allOf` branch while checking the other. Followed its
+   documented advice and disabled that single check; noted that undeclared extra fields are therefore not detected.
+5. *My test was wrong, not the code.* The dead-letter test timed out. Debug logging showed the service had published
+   to the dead-letter topic; my test consumer was built from properties that still pointed at `localhost:9092`
+   instead of the container. Switched the test to the application's own consumer factory. I checked the evidence
+   before touching production code, which would have been the wrong fix.
+6. *Mockito misuse.* I created mocks inside a `thenReturn(...)` argument; moved the construction out.
+
+**Alternatives considered:** `@EmbeddedKafka` (faster, no Docker) versus Testcontainers. Chose Testcontainers because
+PostgreSQL is needed anyway for the native upsert and `SKIP LOCKED` queries, and one mechanism is simpler than two.
+
+**Not done:** No test forces a true optimistic-lock collision (two commits racing); the 409 mapping for it is code
+reviewed only. Listed under next steps.
 
 **Candidate review:**
 
